@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import DraftBoard from './components/tabs/DraftBoard';
+import { BrowserRouter, Route, Router, Routes } from 'react-router-dom';
+import DraftSettings from './components/tabs/DraftSettings';
+import Teams from './components/tabs/Teams';
+import Tiers from './components/tabs/Tiers';
+import MainNavbar from './components/navigation/MainNavBar';
+import MainSidebar from './components/sidebar/MainSidebar';
 
-interface Player {
+export interface Player {
   id: number;
   firstName: string;
 }
@@ -20,11 +27,22 @@ function App() {
   }, []);
 
   return (
-    <ul>
-      {players.map(player => (
-        <li key={player.id}>{player.firstName}</li>
-      ))}
-    </ul>
+    <BrowserRouter>
+      <div className="app">
+        <MainNavbar />
+        <div className="main-layout">
+          <MainSidebar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<DraftBoard players={players} />} />
+              <Route path="/draft-settings" element={<DraftSettings />} />
+              <Route path="/teams" element={<Teams />} />
+              <Route path="/tiers" element={<Tiers />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
 
