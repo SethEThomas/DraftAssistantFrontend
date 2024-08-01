@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: DraftAssistantFrontend
+    image: docker-react-i
+    networks:
+      springapimysql-net:
+    build:
+      context: .
+    ports:
+      - "8081:80"
+
+networks:
+  springapimysql-net:
