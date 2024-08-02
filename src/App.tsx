@@ -7,6 +7,7 @@ import Teams from './components/tabs/Teams';
 import Tiers from './components/tabs/Tiers';
 import MainNavbar from './components/navigation/MainNavBar';
 import MainSidebar from './components/sidebar/MainSidebar';
+import './App.css';
 
 export interface Player {
   id: number;

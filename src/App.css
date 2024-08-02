@@ -1,29 +1,98 @@
+/* Reset some default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html, #root {
+  height: 100%;
+  width: 100%;
+}
+
+/* App container */
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100vw; /* Full width of the viewport */
 }
 
+/* Navbar styling */
 .navbar {
-  background-color: #333;
-  color: white;
-  padding: 1rem;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222; /* Darker background color */
+  color: #fff;
+  padding: 1rem;
+  border-bottom: 2px solid #ccc; /* Light gray border at the bottom */
 }
 
+.navbar .logo {
+  height: 40px; /* Adjust the height as needed */
+  width: auto;  /* Maintain aspect ratio */
+  margin-right: 1rem; /* Space between image and text */
+}
+
+.navbar .navbar-left {
+  display: flex;
+  align-items: center; /* Center vertically */
+}
+
+.navbar-left-text {
+  color: #8cb6f5;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700; /* Bold font */
+}
+
+.navbar .navbar-center {
+  flex: 3; /* Adjust to take about 3/4 of the space */
+  display: flex;
+  justify-content: space-evenly; /* Space out links evenly */
+}
+
+.navbar .navbar-center a {
+  color: #fff; /* Default text color */
+  text-decoration: none; /* Remove underline from links */
+  font-family: 'Roboto', sans-serif; /* Use the selected font */
+  font-weight: 700; /* Bold font for emphasis */
+  margin: 0 1rem; /* Space between links */
+  padding: 0.5rem; /* Space around the text */
+}
+
+.navbar .navbar-center a.active {
+  color: #8cb6f5; /* Light blue color for active link */
+  text-decoration: underline; /* Underline for active link */
+}
+
+.navbar .navbar-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Main layout to hold sidebar and content */
 .main-layout {
   display: flex;
   flex: 1;
+  height: calc(100vh - 3.5rem); /* Adjust height for remaining space */
+  width: 100%; /* Ensure the layout takes the full width */
 }
 
+/* Sidebar styling */
 .sidebar {
-  background-color: #f4f4f4;
+  background-color: #1f1f1f; /* Darker background color */
+  color: #8cb6f5;
   width: 200px;
   padding: 1rem;
+  border-right: 3px solid #ccc; /* Thicker light gray border on the right */
+  height: 100%; /* Full height within the main layout */
+  flex-shrink: 0;
 }
 
+/* Main content styling */
 .main-content {
   flex: 1;
   padding: 1rem;
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }
