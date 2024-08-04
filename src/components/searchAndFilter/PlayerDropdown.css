@@ -1,0 +1,72 @@
+.dropdown-container {
+    position: relative;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 1rem; /* Add space for the icon */
+    border: 2px solid #8cb6f5; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #1f1f1f; /* Match sidebar background color */
+    color: #e0e0e0; /* Light gray text */
+    outline: none;
+    transition: border-color 0.3s; /* Smooth border color transition */
+    position: relative; /* Positioning context for the icon */
+}
+
+.search-input::placeholder {
+    color: #b0b0b0; /* Darker gray for placeholder text */
+}
+
+/* Style for the magnifying glass icon */
+.search-icon {
+    position: absolute;
+    right: 1rem; /* Adjust positioning */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e0e0e0; /* Light gray for the icon */
+    pointer-events: none; /* Ensure clicks go through to the input field */
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #1f1f1f; /* Match sidebar background color */
+    border: 1px solid #8cb6f5; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    max-height: 300px; /* Limit the height */
+    overflow-y: auto; /* Enable scrolling if needed */
+    z-index: 10; /* Ensure it appears on top */
+}
+
+.dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: lightgray; /* Match color scheme */
+    text-decoration: none;
+    border-bottom: 1px solid #333; /* Separator line */
+}
+
+.dropdown-item:hover {
+    background-color: #333; /* Background on hover */
+}
+
+.dropdown-item-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.player-name, .player-team-position {
+    font-size: 0.9rem;
+}

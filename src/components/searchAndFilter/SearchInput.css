@@ -1,0 +1,28 @@
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem; /* Space below the input box */
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #1f1f1f; /* Match the sidebar background color */
+  color: #e0e0e0; /* Light gray text */
+  width: 100%;
+  border-bottom: 2px solid #bccbe1; /* Bottom line with color */
+  transition: border-bottom 0.3s; /* Smooth transition for the underline */
+}
+
+.search-input::placeholder {
+  color: #b0b0b0; /* Darker gray for placeholder text */
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.5rem;
+  color: #8cb6f5; /* Color of the search icon */
+}

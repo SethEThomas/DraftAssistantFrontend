@@ -29,7 +29,7 @@ function App() {
     return (
         <BrowserRouter>
             <div className="app">
-                <MainNavbar />
+                <MainNavbar players={players}/>
                 <div className="main-layout">
                     <MainSidebar players={players} loading={loading} />
                     <main className="main-content">

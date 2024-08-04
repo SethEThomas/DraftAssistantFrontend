@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Player } from '../../interfaces/Player';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
 import PlayerDisplaySmall from '../player/PlayerDisplaySmall';
 import '../../App.css';
+import PositionFilter from '../searchAndFilter/PositionFilter';
+import SearchInput from '../searchAndFilter/SearchInput';
 
 interface SidebarProps {
     players: Player[];
@@ -11,6 +13,20 @@ interface SidebarProps {
 }
 
 const MainSidebar: React.FC<SidebarProps> = ({ players, loading }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedPosition, setSelectedPosition] = useState('All');
+
+    // Filter players based on the search query and selected position
+    const filteredPlayers = players.filter(player => {
+        const normalizedName = player.normalizedName.replace(/\s+/g, '').toLowerCase();
+        const searchNormalized = searchQuery.replace(/\s+/g, '').toLowerCase();
+        const matchesSearch = normalizedName.includes(searchNormalized);
+        
+        const matchesPosition = selectedPosition === 'All' || player.position === selectedPosition;
+
+        return matchesSearch && matchesPosition;
+    });
+
     return (
         <div className="sidebar">
             {loading ? (
@@ -23,11 +39,17 @@ const MainSidebar: React.FC<SidebarProps> = ({ players, loading }) => {
                 </div>
             ) : (
                 <>
-                    <p>Player search will go here</p>
-                    <p>Position filter will go here</p>
+                    <SearchInput 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <PositionFilter 
+                        selectedPosition={selectedPosition}
+                        onPositionChange={setSelectedPosition}
+                    />
                     <div>
                         <ul>
-                            {players.map(player => (
+                            {filteredPlayers.map(player => (
                                 <li key={player.id}>
                                     <PlayerDisplaySmall 
                                         player={player} 
