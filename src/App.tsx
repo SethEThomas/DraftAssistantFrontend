@@ -8,11 +8,8 @@ import Tiers from './components/tabs/Tiers';
 import MainNavbar from './components/navigation/MainNavBar';
 import MainSidebar from './components/sidebar/MainSidebar';
 import './App.css';
+import { Player } from './interfaces/Player';
 
-export interface Player {
-  id: number;
-  firstName: string;
-}
 
 function App() {
   const [players, setPlayers] = useState<Player[]>([]);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Player } from '../../App';
+import { Player } from '../../interfaces/Player';
 
 interface DraftBoardProps {
     players: Player[];
