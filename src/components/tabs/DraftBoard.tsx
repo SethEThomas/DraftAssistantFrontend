@@ -1,21 +1,19 @@
 import React from 'react';
 import { Player } from '../../interfaces/Player';
+import { formatPlayer } from '../../util/FormatUtil';
 
 interface DraftBoardProps {
     players: Player[];
-  }
+}
 
 const DraftBoard: React.FC<DraftBoardProps> = ({ players }) => {
-  return (
-    <div>
-      <h2>Draftboard</h2>
-      <ul>
-      {players.map(player => (
-        <li key={player.id}>{player.firstName}</li>
-      ))}
-    </ul>
-    </div>
-  );
+    const formattedPlayers = players.map(formatPlayer);
+    
+    return (
+        <div>
+            <h2>Draftboard</h2>
+        </div>
+    );
 }
 
 export default DraftBoard;

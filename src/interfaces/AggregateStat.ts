@@ -23,5 +23,4 @@ export interface AggregateStat{
     rushingYard: SingleStat;
     teReceptionBonus: SingleStat;
     totalProjectedPoints: number;
-      
 }

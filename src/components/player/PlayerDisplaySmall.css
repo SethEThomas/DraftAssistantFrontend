@@ -1,0 +1,89 @@
+.player-display-small {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid black;
+    padding: 8px; /* Adjusted padding for a more compact vertical size */
+    color: lightgray;
+    font-size: 14px; /* Adjust as needed */
+    box-sizing: border-box;
+    overflow: hidden; /* Hide overflowing content */
+    align-items: flex-start; /* Align items to the top */
+}
+
+.left-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-right: 10px;
+}
+
+.player-name {
+    font-weight: bold;
+    margin-bottom: 4px; /* Padding between name and position/team abbreviation */
+}
+
+.player-position {
+    font-weight: bold;
+}
+
+.middle-column, .right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px; /* Reduced margin for a more compact look */
+}
+
+.label {
+    font-weight: bold;
+}
+
+.value {
+    font-size: 0.9em; /* Adjust as needed */
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2px; /* Reduced margin for a more compact look */
+}
+
+.horizontal-line {
+    border-top: 1px solid lightgray;
+    margin: 4px 0; /* Padding above and below the line */
+}
+
+.middle-column {
+    border-right: 1px solid lightgray;
+    padding-right: 8px; /* Padding to create space between the middle and right columns */
+}
+
+.right-column {
+    padding-left: 8px; /* Padding to create space between the middle and right columns */
+}
+
+@media (max-width: 600px) {
+    .player-display-small {
+        font-size: 12px; /* Adjust for smaller screens */
+    }
+}
+
+/* PlayerDisplaySmall.css */
+
+.star-rating {
+    font-size: 1.2em; /* Adjust size of stars */
+    color: gold; /* Color for filled stars */
+}
+
+.star-rating span {
+    display: inline-block;
+}
