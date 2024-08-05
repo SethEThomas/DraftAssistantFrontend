@@ -9,41 +9,50 @@ import MainNavbar from './components/navigation/MainNavBar';
 import MainSidebar from './components/sidebar/MainSidebar';
 import './App.css';
 import { Player } from './interfaces/Player';
+import { BACKEND_URL } from './util/constants';
 
 function App() {
-    const [players, setPlayers] = useState<Player[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        axios.get<Player[]>('http://localhost:8080/api/players')
-            .then(response => {
-                setPlayers(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error(error);
-                setLoading(false);
-            });
-    }, []);
+  useEffect(() => {
+      axios.get<Player[]>(BACKEND_URL + '/players')
+          .then(response => {
+              setPlayers(response.data);
+              setLoading(false);
+          })
+          .catch(error => {
+              console.error(error);
+              setLoading(false);
+          });
+  }, []);
 
-    return (
-        <BrowserRouter>
-            <div className="app">
-                <MainNavbar players={players}/>
-                <div className="main-layout">
-                    <MainSidebar players={players} loading={loading} />
-                    <main className="main-content">
-                        <Routes>
-                            <Route path="/" element={<DraftBoard players={players} />} />
-                            <Route path="/draft-settings" element={<DraftSettings />} />
-                            <Route path="/teams" element={<Teams />} />
-                            <Route path="/tiers" element={<Tiers />} />
-                        </Routes>
-                    </main>
-                </div>
-            </div>
-        </BrowserRouter>
+  const handleUpdatePlayer = (updatedPlayer: Player) => {
+    setPlayers((prevPlayers) =>
+        prevPlayers.map((player) =>
+            player.id === updatedPlayer.id ? updatedPlayer : player
+        )
     );
+};
+
+  return (
+      <BrowserRouter>
+          <div className="app">
+              <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} />
+              <div className="main-layout">
+                  <MainSidebar players={players} loading={loading} />
+                  <main className="main-content">
+                      <Routes>
+                          <Route path="/" element={<DraftBoard players={players} />} />
+                          <Route path="/draft-settings" element={<DraftSettings />} />
+                          <Route path="/teams" element={<Teams />} />
+                          <Route path="/tiers" element={<Tiers />} />
+                      </Routes>
+                  </main>
+              </div>
+          </div>
+      </BrowserRouter>
+  );
 }
 
 export default App;

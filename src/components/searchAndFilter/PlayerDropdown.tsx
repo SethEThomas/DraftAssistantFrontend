@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './PlayerDropdown.css';
-
-interface Player {
-    id: number;
-    firstName: string;
-    lastName: string;
-    teamAbbreviation: string;
-    position: string;
-    normalizedName: string;
-}
+import EditPlayerModal from '../player/EditPlayerModal';
+import { Player } from '../../interfaces/Player';
 
 interface PlayerDropdownProps {
     players: Player[];
+    onUpdatePlayer: (updatedPlayer: Player) => void;
 }
 
 const positionColors: { [key: string]: string } = {
@@ -22,10 +16,11 @@ const positionColors: { [key: string]: string } = {
     RB: 'darkgreen',
 };
 
-const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players }) => {
+const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
     useEffect(() => {
         const filtered = players.filter(player => {
@@ -45,6 +40,21 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players }) => {
         setDropdownVisible(false);
     };
 
+    const handleEditPlayer = (player: Player) => {
+        setSelectedPlayer(player);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedPlayer(null);
+    };
+
+    const handleSubmitModal = (updatedPlayer: Player) => {
+        onUpdatePlayer(updatedPlayer); // Update player in parent state
+        setSelectedPlayer(null);
+        // Call API to update the player in the database
+        // Example: axios.put('/api/players/' + updatedPlayer.id, updatedPlayer)
+    };
+
     return (
         <div className="dropdown-container">
             <div className="search-container">
@@ -61,11 +71,10 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players }) => {
                     {filteredPlayers.map(player => {
                         const positionColor = positionColors[player.position] || '#ffffff'; // Default color
                         return (
-                            <Link
+                            <div
                                 key={player.id}
-                                to={`http://localhost:8081/players/${player.id}`}
                                 className="dropdown-item"
-                                onClick={handleDropdownClick}
+                                onClick={() => handleEditPlayer(player)}
                                 style={{ backgroundColor: positionColor }}
                             >
                                 <div className="dropdown-item-content">
@@ -74,10 +83,17 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players }) => {
                                         <span className="player-team-position">({player.teamAbbreviation}, {player.position})</span>
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         );
                     })}
                 </div>
+            )}
+            {selectedPlayer && (
+                <EditPlayerModal
+                    player={selectedPlayer}
+                    onClose={handleCloseModal}
+                    onSubmit={handleSubmitModal}
+                />
             )}
         </div>
     );

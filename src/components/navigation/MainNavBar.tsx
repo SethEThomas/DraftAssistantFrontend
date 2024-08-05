@@ -6,9 +6,10 @@ import PlayerDropdown from '../searchAndFilter/PlayerDropdown';
 
 interface MainNavbarProps {
     players: Player[];
+    onUpdatePlayer: (updatedPlayer: Player) => void;
 }
 
-const MainNavbar: React.FC<MainNavbarProps> = ({ players }) => {
+const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer }) => {
     return (
         <nav className="navbar">
             <div className="navbar-left">
@@ -30,7 +31,7 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ players }) => {
                 </NavLink>
             </div>
             <div className="navbar-right">
-                <PlayerDropdown players={players} />
+                <PlayerDropdown players={players} onUpdatePlayer={onUpdatePlayer} />
             </div>
         </nav>
     );
