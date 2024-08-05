@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import './PlayerDropdown.css';
 import EditPlayerModal from '../player/EditPlayerModal';
 import { Player } from '../../interfaces/Player';
@@ -32,12 +31,21 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
     }, [searchQuery, players]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-        setDropdownVisible(true);
+        const query = e.target.value;
+        setSearchQuery(query);
+        setDropdownVisible(query.length > 0); // Show dropdown only if there is text
     };
 
-    const handleDropdownClick = () => {
-        setDropdownVisible(false);
+    const handleBlur = () => {
+        // Timeout to ensure dropdown click event is processed before hiding
+        setTimeout(() => {
+            setSearchQuery('');
+            setDropdownVisible(false);
+        }, 100);
+    };
+
+    const handleDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation(); // Prevent the dropdown from closing when clicking inside it
     };
 
     const handleEditPlayer = (player: Player) => {
@@ -61,11 +69,12 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
                     className="search-input"
                     value={searchQuery}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     placeholder="Search for a player"
                 />
             </div>
             {dropdownVisible && filteredPlayers.length > 0 && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu" onClick={handleDropdownClick}>
                     {filteredPlayers.map(player => {
                         const positionColor = positionColors[player.position] || '#ffffff'; // Default color
                         return (
