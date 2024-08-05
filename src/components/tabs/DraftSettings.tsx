@@ -24,6 +24,11 @@ interface DraftSettingsProps {
       setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));
     };
   
+    const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, checked } = e.target;
+      setSettings(prevSettings => ({ ...prevSettings, [name]: checked }));
+    };
+  
     const handleSave = () => {
       onSave(settings);
       setInitialSettings(settings);
@@ -75,12 +80,15 @@ interface DraftSettingsProps {
           </label>
           <label>
             3rd round reversal:
-            <input
-              type="checkbox"
-              name="thirdRoundReversal"
-              checked={settings.thirdRoundReversal}
-              onChange={handleChange}
-            />
+            <label className="switch">
+              <input
+                type="checkbox"
+                name="thirdRoundReversal"
+                checked={settings.thirdRoundReversal}
+                onChange={handleToggle}
+              />
+              <span className="slider round"></span>
+            </label>
           </label>
           <label>
             Display ADP:
