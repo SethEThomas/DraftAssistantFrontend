@@ -27,8 +27,16 @@ const EditPlayerModal: React.FC<EditPlayerModalProps> = ({ player, onClose, onSu
             positionalDepth: positionalDepth ? Number(positionalDepth) : 0,
             notes,
             isSleeper,
+            overallRank: overallRank ? Number(overallRank) : 0,
+            overallTier: overallTier ? Number(overallTier) : 0,
+            positionalRank: positionalRank ? Number(positionalRank) : 0,
+            positionalTier: positionalTier ? Number(positionalTier) : 0,
         };
-    
+        sendPlayerDataToBackend(updatedPlayer);
+        onSubmit(updatedPlayer);
+    };
+
+    const sendPlayerDataToBackend = async (updatedPlayer: Player) => {
         const updateTiers = [
             { playerId: player.id, tierType: 'OVERALL', tier: overallTier ? Number(overallTier) : 0, id: player.id },
             { playerId: player.id, tierType: player.position, tier: positionalTier ? Number(positionalTier) : 0, id: player.id },
@@ -49,8 +57,7 @@ const EditPlayerModal: React.FC<EditPlayerModalProps> = ({ player, onClose, onSu
         } catch (error) {
             console.error('Error updating player data:', error);
         }
-    };
-    
+    }
 
     return (
         <div className="modal-overlay">

@@ -51,8 +51,6 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
     const handleSubmitModal = (updatedPlayer: Player) => {
         onUpdatePlayer(updatedPlayer); // Update player in parent state
         setSelectedPlayer(null);
-        // Call API to update the player in the database
-        // Example: axios.put('/api/players/' + updatedPlayer.id, updatedPlayer)
     };
 
     return (
