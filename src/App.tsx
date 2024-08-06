@@ -17,10 +17,10 @@ import { Position } from './enums/Position.enum';
 import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
 
 const initialDraftSettings: DraftSettingsInterface = {
-    numTeams: 10,
-    myTeam: 1,
+    numTeams: 12,
+    myTeam: 12,
     numRounds: 15,
-    thirdRoundReversal: false,
+    thirdRoundReversal: true,
     displayAdpType: AdpType.STANDARD,
     displayAdpPlatform: Platform.SLEEPER,
     scoringSettings: [],
@@ -78,7 +78,6 @@ const initialDraftSettings: DraftSettingsInterface = {
         if (settingsChanged) {
           setUpdating(true);
       
-          // Transform the scoring settings to the required format
           const scoringSettingsPayload = updatedSettings.scoringSettings.map(setting => ({
             scoringSettingId: setting.id,
             pointValue: setting.pointValue,
