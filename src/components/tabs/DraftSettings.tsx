@@ -5,6 +5,7 @@ import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface'
 import './DraftSettings.css';
 import ScoringSettingsModal from './modals/ScoringSettings';
 import { ScoringSettingInterface } from '../../interfaces/ScoringSettingInterface';
+import RosterSettingsModal from './modals/RosterSettingsModal';
 
 interface DraftSettingsProps {
   draftSettings: DraftSettingsInterface;
@@ -14,7 +15,8 @@ interface DraftSettingsProps {
 const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) => {
   const [settings, setSettings] = useState<DraftSettingsInterface>(draftSettings);
   const [initialSettings, setInitialSettings] = useState<DraftSettingsInterface>(draftSettings);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScoringModalOpen, setIsScoringModalOpen] = useState(false);
+  const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
   const [scoringSettings, setScoringSettings] = useState<ScoringSettingInterface[]>(draftSettings.scoringSettings);
 
   useEffect(() => {
@@ -43,12 +45,22 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
     setSettings(initialSettings);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
+  const handleOpenScoringModal = () => {
+    setIsRosterModalOpen(false);
+    setIsScoringModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseScoringModal = () => {
+    setIsScoringModalOpen(false);
+  };
+
+  const handleOpenRosterModal = () => {
+    setIsScoringModalOpen(false);
+    setIsRosterModalOpen(true);
+  };
+
+  const handleCloseRosterModal = () => {
+    setIsRosterModalOpen(false);
   };
 
   const handleUpdateScoringSettings = (updatedSettings: ScoringSettingInterface[]) => {
@@ -59,7 +71,22 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
     }));
   };
 
+  const handleUpdateRosterSettings = (updatedRosterSettings: DraftSettingsInterface['teamSettings']) => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      teamSettings: updatedRosterSettings,
+    }));
+  };
+
   const hasChanges = JSON.stringify(settings) !== JSON.stringify(initialSettings);
+
+  useEffect(() => {
+    if (isScoringModalOpen || isRosterModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isScoringModalOpen, isRosterModalOpen]);
 
   return (
     <div className="draft-settings">
@@ -128,12 +155,12 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
           </select>
         </label>
         <div className="modal-links">
-          <a href="#scoring-settings" onClick={(e) => { e.preventDefault(); handleOpenModal(); }}>
+          <a href="#scoring-settings" onClick={(e) => { e.preventDefault(); handleOpenScoringModal(); }}>
             Scoring Settings
             <i className="fas fa-external-link-alt icon"></i>
           </a>
-          <a href="#team-settings" onClick={() => alert('Team Settings Modal')}>
-            Team Settings
+          <a href="#roster-settings" onClick={(e) => { e.preventDefault(); handleOpenRosterModal(); }}>
+            Roster Settings
             <i className="fas fa-external-link-alt icon"></i>
           </a>
         </div>
@@ -147,10 +174,16 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
         </div>
       </form>
       <ScoringSettingsModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isScoringModalOpen}
+        onClose={handleCloseScoringModal}
         scoringSettings={scoringSettings}
         onSave={handleUpdateScoringSettings}
+      />
+      <RosterSettingsModal
+        isOpen={isRosterModalOpen}
+        onClose={handleCloseRosterModal}
+        rosterSettings={settings.teamSettings}
+        onSave={handleUpdateRosterSettings}
       />
     </div>
   );

@@ -11,9 +11,11 @@ interface ScoringSettingsModalProps {
 
 const ScoringSettingsModal: React.FC<ScoringSettingsModalProps> = ({ isOpen, onClose, scoringSettings, onSave }) => {
     const [settings, setSettings] = useState<ScoringSettingInterface[]>(scoringSettings);
+    const [initialSettings, setInitialSettings] = useState<ScoringSettingInterface[]>(scoringSettings);
 
     useEffect(() => {
         setSettings(scoringSettings);
+        setInitialSettings(scoringSettings);
     }, [scoringSettings]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +42,7 @@ const ScoringSettingsModal: React.FC<ScoringSettingsModalProps> = ({ isOpen, onC
     };
 
     const handleCancel = () => {
+        setSettings(initialSettings);
         onClose();
     };
 
