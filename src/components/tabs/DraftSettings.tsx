@@ -4,7 +4,7 @@ import { Platform } from '../../enums/Platform.enum';
 import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
 import './DraftSettings.css';
 import ScoringSettingsModal from './modals/ScoringSettings';
-import { ScoringSettings } from '../../interfaces/ScoringSettings';
+import { ScoringSettingInterface } from '../../interfaces/ScoringSettingInterface';
 
 interface DraftSettingsProps {
   draftSettings: DraftSettingsInterface;
@@ -15,7 +15,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
   const [settings, setSettings] = useState<DraftSettingsInterface>(draftSettings);
   const [initialSettings, setInitialSettings] = useState<DraftSettingsInterface>(draftSettings);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scoringSettings, setScoringSettings] = useState<ScoringSettings>(draftSettings.scoringSettings);
+  const [scoringSettings, setScoringSettings] = useState<ScoringSettingInterface[]>(draftSettings.scoringSettings);
 
   useEffect(() => {
     setSettings(draftSettings);
@@ -51,7 +51,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
     setIsModalOpen(false);
   };
 
-  const handleUpdateScoringSettings = (updatedSettings: ScoringSettings) => {
+  const handleUpdateScoringSettings = (updatedSettings: ScoringSettingInterface[]) => {
     setScoringSettings(updatedSettings);
     setSettings(prevSettings => ({
       ...prevSettings,
@@ -71,7 +71,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
             type="number"
             name="numTeams"
             value={settings.numTeams}
-            onChange={(e) => handleChange(e)}
+            onChange={handleChange}
             min="1"
           />
         </label>

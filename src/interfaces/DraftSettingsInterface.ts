@@ -1,7 +1,7 @@
 import { AdpType } from "../enums/AdpType.enum";
-import { ScoringSettings } from "./ScoringSettings";
 import { RosterSettings } from "./RosterSettings";
 import { Platform } from "../enums/Platform.enum";
+import { ScoringSettingInterface } from "./ScoringSettingInterface";
 
 export interface DraftSettingsInterface{
     numTeams: number;
@@ -10,6 +10,6 @@ export interface DraftSettingsInterface{
     thirdRoundReversal: boolean;
     displayAdpType: AdpType;
     displayAdpPlatform: Platform;
-    scoringSettings: ScoringSettings;
+    scoringSettings: ScoringSettingInterface[];
     teamSettings: RosterSettings;
 }

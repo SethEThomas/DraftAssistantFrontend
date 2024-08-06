@@ -13,8 +13,8 @@ import { BACKEND_URL } from './util/constants';
 import { AdpType } from './enums/AdpType.enum';
 import { Platform } from './enums/Platform.enum';
 import { DraftSettingsInterface } from './interfaces/DraftSettingsInterface';
-import { ScoringSettings } from './interfaces/ScoringSettings';
 import { Position } from './enums/Position.enum';
+import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 10,
@@ -23,29 +23,7 @@ const initialDraftSettings: DraftSettingsInterface = {
   thirdRoundReversal: false,
   displayAdpType: AdpType.STANDARD,
   displayAdpPlatform: Platform.SLEEPER,
-  scoringSettings: {
-      completionPctPoints: 0,
-      passing2PtPoints: 2,
-      passAttemptPoints: 0,
-      passCompletionPoints: 0,
-      passingFirstDownPoints: 0,
-      passingInterceptionPoints: -2,
-      passingTdPoints: 6,
-      passingYardPoints: 0.04,
-      fumblePoints: -2,
-      receiving2PtPoints: 2,
-      receptionPoints: 1,
-      reception40PlusPoints: 1,
-      receptionFirstDownPoints: 0,
-      receivingTdPoints: 6,
-      receivingYardPoints: 0.1,
-      rushing2PtPoints: 2,
-      rushingAttemptPoints: 0,
-      rushingFirstDownPoints: 0,
-      rushingTdPoints: 6,
-      rushingYardPoints: 0.1,
-      teReceptionBonusPoints: 0.5,
-  },
+  scoringSettings: [],
   teamSettings: {
       qbSlots: 1,
       wrSlots: 2,
@@ -73,15 +51,16 @@ function App() {
               setLoading(false);
           });
 
-      axios.get<ScoringSettings>(BACKEND_URL + '/scoring-settings')
+        axios.get<ScoringSettingInterface[]>(BACKEND_URL + '/scoring/settings')
           .then(response => {
-              setDraftSettings(prevSettings => ({
-                  ...prevSettings,
-                  scoringSettings: response.data,
-              }));
+            // No transformation needed; just use the list directly
+            setDraftSettings(prevSettings => ({
+              ...prevSettings,
+              scoringSettings: response.data,
+            }));
           })
           .catch(error => {
-              console.error(error);
+            console.error(error);
           });
   }, []);
 
