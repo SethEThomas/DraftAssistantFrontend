@@ -75,11 +75,11 @@ body, html, #root {
 .main-layout {
   display: flex;
   flex: 1;
-  height: calc(100vh - 3.5rem); /* Adjust height for remaining space */
   width: 100%; /* Ensure the layout takes the full width */
+  height: 100%; /* Ensure it takes the full height */
 }
 
-/* Ensure this file is included in your component */
+/* Sidebar styling */
 .sidebar {
   background-color: #1f1f1f;
   color: #8cb6f5;
@@ -92,6 +92,13 @@ body, html, #root {
   position: relative; /* Needed for positioning the spinner */
 }
 
+/* Main content styling */
+.main-content {
+  flex: 1;
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+/* Loading container styling */
 .loading-container {
   position: absolute;
   top: 50%;
@@ -120,17 +127,9 @@ body, html, #root {
 
 @keyframes dot-blink {
   0%, 100% {
-      opacity: 0;
+    opacity: 0;
   }
   50% {
-      opacity: 1;
+    opacity: 1;
   }
-}
-
-
-/* Main content styling */
-.main-content {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }
