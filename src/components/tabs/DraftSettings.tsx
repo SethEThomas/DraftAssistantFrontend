@@ -30,10 +30,8 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
     const newValue = type === 'checkbox' && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value;
     
     if (name === 'displayAdpType') {
-      // Ensure proper parsing for displayAdpType
       const [platformStr, adpTypeStr] = value.split(' ');
       
-      // Check if both parts are defined and non-empty
       if (platformStr && adpTypeStr) {
         const platform = Object.values(Platform).find(p => p === platformStr);
         const adpType = Object.values(AdpType).find(a => a === adpTypeStr);
@@ -41,8 +39,8 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
         if (platform && adpType) {
           setSettings(prevSettings => ({
             ...prevSettings,
-            displayAdpType: adpType, // Correctly assign AdpType enum
-            displayAdpPlatform: platform, // Correctly assign Platform enum
+            displayAdpType: adpType,
+            displayAdpPlatform: platform,
           }));
         } else {
           console.error('Invalid platform or ADP type');
@@ -54,7 +52,6 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
       setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));
     }
   };
-  
 
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -168,7 +165,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
           Display ADP:
           <select
             name="displayAdpType"
-            value={settings.displayAdpType}
+            value={`${settings.displayAdpPlatform} ${settings.displayAdpType}`}
             onChange={handleChange}
           >
             {Object.values(Platform).map(platform =>
