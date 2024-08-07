@@ -87,3 +87,17 @@
 .star-rating span {
     display: inline-block;
 }
+
+.player-display-small .left-column .adp-info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: lightgray;
+}
+
+.player-display-small .left-column .adp-info .label {
+    font-weight: bold;
+}
+
+.player-display-small .left-column .adp-info .value {
+    font-weight: normal;
+}

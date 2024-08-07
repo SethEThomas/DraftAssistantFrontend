@@ -28,8 +28,33 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const newValue = type === 'checkbox' && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value;
-    setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));
+    
+    if (name === 'displayAdpType') {
+      // Ensure proper parsing for displayAdpType
+      const [platformStr, adpTypeStr] = value.split(' ');
+      
+      // Check if both parts are defined and non-empty
+      if (platformStr && adpTypeStr) {
+        const platform = Object.values(Platform).find(p => p === platformStr);
+        const adpType = Object.values(AdpType).find(a => a === adpTypeStr);
+  
+        if (platform && adpType) {
+          setSettings(prevSettings => ({
+            ...prevSettings,
+            displayAdpType: adpType, // Correctly assign AdpType enum
+            displayAdpPlatform: platform, // Correctly assign Platform enum
+          }));
+        } else {
+          console.error('Invalid platform or ADP type');
+        }
+      } else {
+        console.error('Invalid dropdown value');
+      }
+    } else {
+      setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));
+    }
   };
+  
 
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -43,6 +68,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
 
   const handleCancel = () => {
     setSettings(initialSettings);
+    setScoringSettings(initialSettings.scoringSettings);
   };
 
   const handleOpenScoringModal = () => {

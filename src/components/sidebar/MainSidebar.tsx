@@ -3,32 +3,35 @@ import { Player } from '../../interfaces/Player';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
 import PlayerDisplaySmall from '../player/PlayerDisplaySmall';
-import '../../App.css';
+import './MainSidebar.css';
 import PositionFilter from '../searchAndFilter/PositionFilter';
 import SearchInput from '../searchAndFilter/SearchInput';
 
 interface SidebarProps {
     players: Player[];
     loading: boolean;
+    adpType: AdpType;
+    platform: Platform;
 }
 
-const MainSidebar: React.FC<SidebarProps> = ({ players, loading }) => {
+const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platform }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosition, setSelectedPosition] = useState('All');
+    const [isCollapsed, setIsCollapsed] = useState(false); // State for collapse
 
-    // Filter players based on the search query and selected position
     const filteredPlayers = players.filter(player => {
         const normalizedName = player.normalizedName.replace(/\s+/g, '').toLowerCase();
         const searchNormalized = searchQuery.replace(/\s+/g, '').toLowerCase();
         const matchesSearch = normalizedName.includes(searchNormalized);
-        
         const matchesPosition = selectedPosition === 'All' || player.position === selectedPosition;
-
         return matchesSearch && matchesPosition;
     });
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+            <button className="toggle-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
+                {isCollapsed ? '▶' : '◀'}
+            </button>
             {loading ? (
                 <div className="loading-container">
                     <div className="dots-container">
@@ -39,22 +42,26 @@ const MainSidebar: React.FC<SidebarProps> = ({ players, loading }) => {
                 </div>
             ) : (
                 <>
-                    <SearchInput 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <PositionFilter 
-                        selectedPosition={selectedPosition}
-                        onPositionChange={setSelectedPosition}
-                    />
+                    {!isCollapsed && (
+                        <>
+                            <SearchInput 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <PositionFilter 
+                                selectedPosition={selectedPosition}
+                                onPositionChange={setSelectedPosition}
+                            />
+                        </>
+                    )}
                     <div>
                         <ul>
                             {filteredPlayers.map(player => (
                                 <li key={player.id}>
                                     <PlayerDisplaySmall 
                                         player={player} 
-                                        adpType={AdpType.HALF_PPR}
-                                        platform={Platform.SLEEPER}
+                                        adpType={adpType}
+                                        platform={platform}
                                     />
                                 </li>
                             ))}

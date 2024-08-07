@@ -17,117 +17,125 @@ import { Position } from './enums/Position.enum';
 import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
 
 const initialDraftSettings: DraftSettingsInterface = {
-    numTeams: 12,
-    myTeam: 12,
-    numRounds: 15,
-    thirdRoundReversal: true,
-    displayAdpType: AdpType.STANDARD,
-    displayAdpPlatform: Platform.SLEEPER,
-    scoringSettings: [],
-    teamSettings: {
-      qbSlots: 1,
-      wrSlots: 2,
-      rbSlots: 2,
-      teSlots: 1,
-      flexSpots: 2,
-      flexOptions: [Position.WR, Position.RB, Position.TE],
-      benchSlots: 7,
-    },
+  numTeams: 12,
+  myTeam: 12,
+  numRounds: 15,
+  thirdRoundReversal: true,
+  displayAdpType: AdpType.PPR,
+  displayAdpPlatform: Platform.SLEEPER,
+  scoringSettings: [],
+  teamSettings: {
+    qbSlots: 1,
+    wrSlots: 2,
+    rbSlots: 2,
+    teSlots: 1,
+    flexSpots: 2,
+    flexOptions: [Position.WR, Position.RB, Position.TE],
+    benchSlots: 7,
+  },
+};
+
+function App() {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    axios.get<Player[]>(BACKEND_URL + '/players')
+      .then(response => {
+        setPlayers(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setLoading(false);
+      });
+
+    axios.get<ScoringSettingInterface[]>(BACKEND_URL + '/scoring/settings')
+      .then(response => {
+        setDraftSettings(prevSettings => ({
+          ...prevSettings,
+          scoringSettings: response.data,
+        }));
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
+
+  const handleUpdatePlayer = (updatedPlayer: Player) => {
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.id === updatedPlayer.id ? updatedPlayer : player
+      )
+    );
   };
-  
-  function App() {
-    const [players, setPlayers] = useState<Player[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
-    const [updating, setUpdating] = useState(false);
-  
-    useEffect(() => {
-      axios.get<Player[]>(BACKEND_URL + '/players')
+
+  const handleUpdateDraftSettings = (updatedSettings: DraftSettingsInterface) => {
+    const settingsChanged = JSON.stringify(draftSettings.scoringSettings) !== JSON.stringify(updatedSettings.scoringSettings);
+
+    if (settingsChanged) {
+      setUpdating(true);
+
+      const scoringSettingsPayload = updatedSettings.scoringSettings.map(setting => ({
+        scoringSettingId: setting.id,
+        pointValue: setting.pointValue,
+      }));
+
+      axios.post<Player[]>(BACKEND_URL + '/scoring/update?returnPlayers=true', scoringSettingsPayload)
         .then(response => {
           setPlayers(response.data);
-          setLoading(false);
+          setUpdating(false);
         })
         .catch(error => {
           console.error(error);
-          setLoading(false);
+          setUpdating(false);
         });
-  
-      axios.get<ScoringSettingInterface[]>(BACKEND_URL + '/scoring/settings')
-        .then(response => {
-          setDraftSettings(prevSettings => ({
-            ...prevSettings,
-            scoringSettings: response.data,
-          }));
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }, []);
-  
-    const handleUpdatePlayer = (updatedPlayer: Player) => {
-      setPlayers((prevPlayers) =>
-        prevPlayers.map((player) =>
-          player.id === updatedPlayer.id ? updatedPlayer : player
-        )
-      );
-    };
-  
-    const handleUpdateDraftSettings = (updatedSettings: DraftSettingsInterface) => {
-        const settingsChanged = JSON.stringify(draftSettings.scoringSettings) !== JSON.stringify(updatedSettings.scoringSettings);
-      
-        if (settingsChanged) {
-          setUpdating(true);
-      
-          const scoringSettingsPayload = updatedSettings.scoringSettings.map(setting => ({
-            scoringSettingId: setting.id,
-            pointValue: setting.pointValue,
-          }));
-      
-          axios.post<Player[]>(BACKEND_URL + '/scoring/update?returnPlayers=true', scoringSettingsPayload)
-            .then(response => {
-              setPlayers(response.data);
-              setUpdating(false);
-            })
-            .catch(error => {
-              console.error(error);
-              setUpdating(false);
-            });
-        }
-      
-        setDraftSettings(updatedSettings);
-      };
-      
-  
-    if (loading || updating) {
-      return (
-        <div className="loading-container">
-          <div className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </div>
-        </div>
-      );
     }
-  
+
+    setDraftSettings(updatedSettings);
+  };
+
+  if (loading || updating) {
     return (
-      <BrowserRouter>
-        <div className="app">
-          <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} />
-          <div className="main-layout">
-            <MainSidebar players={players} loading={loading} />
-            <main className="main-content">
-              <Routes>
-                <Route path="/" element={<DraftBoard players={players} />} />
-                <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
-                <Route path="/teams" element={<Teams />} />
-                <Route path="/tiers" element={<Tiers />} />
-              </Routes>
-            </main>
-          </div>
+      <div className="loading-container">
+        <div className="dots-container">
+          <div className="dot"></div>
+          <div className="dot"></div>
+          <div className="dot"></div>
         </div>
-      </BrowserRouter>
+      </div>
     );
   }
-  
-  export default App;
+
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} />
+        <div className="main-layout">
+          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<DraftBoard players={players} />} />
+              <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
+              <Route path="/teams" element={<Teams />} />
+              <Route 
+                path="/tiers" 
+                element={
+                  <Tiers 
+                    players={players} 
+                    adpType={draftSettings.displayAdpType} 
+                    platform={draftSettings.displayAdpPlatform} 
+                  />
+                } 
+              />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;

@@ -1,5 +1,3 @@
-// PlayerDisplaySmall.tsx
-
 import React from 'react';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
@@ -36,12 +34,18 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
     const backgroundColor = positionColorMapping[player.position];
     const adpField = `${Platform[platform].toLowerCase()}${toCamelCase(AdpType[adpType])}`;
     const adpValue = (player.adp as any)[adpField];
+    const platformLabel = Platform[platform].replace(/_/g, ' ');
+    const adpTypeLabel = AdpType[adpType].replace(/_/g, ' ');
 
     return (
         <div className="player-display-small" style={{ backgroundColor }}>
             <div className="left-column">
                 <div className="player-name">{player.firstName} {player.lastName}</div>
                 <div className="player-position">{player.position} {player.teamAbbreviation}</div>
+                <div className="adp-info">
+                    <div className="label">{platformLabel} {adpTypeLabel} ADP:</div>
+                    <div className="value">{formatNumber(adpValue)}</div>
+                </div>
             </div>
             <div className="middle-column">
                 <div className="stat-section">

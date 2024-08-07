@@ -1,0 +1,42 @@
+.tiers-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem; /* Reduced gap between grid items */
+  }
+  
+  .positional-tiers {
+    background-color: #1f1f1f; /* Match sidebar color */
+    color: #8cb6f5; /* Match text color */
+    padding: 0.5rem; /* Reduced padding */
+    border: 1px solid #ccc;
+    font-size: 0.9rem; /* Slightly smaller font size */
+  }
+  
+  .positional-tiers h2 {
+    border-bottom: 1px solid #8cb6f5; /* Thinner border */
+    padding-bottom: 0.25rem; /* Reduced padding */
+    margin-bottom: 0.5rem; /* Reduced margin */
+  }
+  
+  .individual-tier {
+    background-color: #2f2f2f; /* Slightly darker background */
+    padding: 0.25rem; /* Reduced padding */
+    border-radius: 4px;
+    margin-bottom: 0.5rem; /* Reduced margin */
+  }
+  
+  .individual-tier h3 {
+    color: #8cb6f5; /* Match tier label color */
+    font-size: 0.9rem; /* Slightly smaller font size */
+  }
+  
+  .individual-tier ul {
+    list-style: none;
+    padding: 0;
+    font-size: 0.8rem; /* Smaller font size */
+  }
+  
+  .individual-tier li {
+    margin: 0.25rem 0; /* Reduced margin */
+  }
+  
