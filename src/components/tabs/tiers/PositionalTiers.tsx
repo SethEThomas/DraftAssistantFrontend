@@ -12,6 +12,7 @@ interface PositionalTiersProps {
   position: Position;
   adpType: AdpType;
   platform: Platform;
+  isLocked: boolean;
 }
 
 const defaultTiers: Tier[] = [
@@ -22,7 +23,7 @@ const defaultTiers: Tier[] = [
   }
 ];
 
-const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform }) => {
+const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked }) => {
   const [tiers, setTiers] = useState<Tier[]>(defaultTiers);
 
   useEffect(() => {
@@ -61,17 +62,51 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
     setTiers(groupedTiers);
   }, [players, position]);
 
+  const addTier = () => {
+    const maxTierNumber = tiers.reduce((max, tier) => {
+      return tier.tierNumber > max ? tier.tierNumber : max;
+    }, 0);
+  
+    const newTier: Tier = {
+      tierName: `Tier ${maxTierNumber + 1}`,
+      tierNumber: maxTierNumber + 1,
+      players: []
+    };
+    setTiers([...tiers, newTier]);
+  };
+
   return (
     <div className="positional-tiers">
       <h2>{position}</h2>
-      {tiers.map((tier) => (
-        <IndividualTier 
-          key={tier.tierNumber} 
-          tier={tier} 
-          adpType={adpType} 
-          platform={platform} 
-        />
-      ))}
+      {tiers
+        .filter((tier) => tier.tierNumber !== 0)
+        .map((tier) => (
+          <IndividualTier 
+            key={tier.tierNumber} 
+            tier={tier} 
+            adpType={adpType} 
+            platform={platform} 
+          />
+        ))
+      }
+      {!isLocked && (
+        <div className="add-tier-container">
+          <div className="add-tier-text" onClick={addTier}>
+            Add Tier +
+          </div>
+        </div>
+      )}
+      {tiers
+        .filter((tier) => tier.tierNumber === 0)
+        .map((tier) => (
+          <IndividualTier 
+            key={tier.tierNumber} 
+            tier={tier} 
+            adpType={adpType} 
+            platform={platform} 
+          />
+        ))
+      }
     </div>
   );
 };

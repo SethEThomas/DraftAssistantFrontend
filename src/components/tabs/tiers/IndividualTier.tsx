@@ -13,21 +13,25 @@ interface IndividualTierProps {
 
 const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform }) => {
     return (
-        <div className="individual-tier">
-            <h3>{tier.tierName}</h3>
+      <div className="individual-tier">
+        <h3>{tier.tierName}</h3>
+        {tier.players.length === 0 ? (
+          <div className="empty-tier-placeholder">Drag players to add</div>
+        ) : (
             <ul>
-                {tier.players.map(player => (
-                    <li key={player.id}>
-                        <PlayerDisplaySmall 
-                            player={player} 
-                            adpType={adpType} 
-                            platform={platform} 
-                        />
-                    </li>
-                ))}
-            </ul>
-        </div>
+            {tier.players.map(player => (
+                <li key={player.id}>
+                    <PlayerDisplaySmall 
+                        player={player} 
+                        adpType={adpType} 
+                        platform={platform} 
+                    />
+                </li>
+            ))}
+        </ul>
+        )}
+      </div>
     );
-};
+  };
 
 export default IndividualTier;

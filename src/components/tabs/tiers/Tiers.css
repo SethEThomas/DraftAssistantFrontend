@@ -1,8 +1,21 @@
-.tiers-container {
+  .tiers-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 0.5rem;
+    position: relative;
   }
+
+  .lock-button {
+    position: absolute;
+    top: 5px;
+    right: 0px;
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
   
   .positional-tiers {
     background-color: #1f1f1f;
@@ -40,3 +53,61 @@
     margin: 0.25rem 0;
   }
   
+  .empty-tier-placeholder {
+    height: 100px;
+    border: 2px dotted lightblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightblue;
+    font-size: 1rem;
+  }
+
+  .add-tier-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    width: 100%;
+  }
+  
+  .add-tier-text {
+    color: lightgray;
+    cursor: pointer;
+    position: relative;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+  
+  .add-tier-text::before,
+  .add-tier-text::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    border-bottom: 1px solid lightgray;
+    width: 70px;
+    height: 0;
+    transform: translateY(-50%);
+  }
+  
+  .add-tier-text::before {
+    right: calc(100% - 15px);
+    margin-right: 10px;
+  }
+  
+  .add-tier-text::after {
+    left: calc(100% - 15px);
+    margin-left: 10px;
+  }
+  
+  .add-tier-text:hover {
+    color: white;
+  }
+
+.add-tier-text:hover::before,
+.add-tier-text:hover::after {
+  border-color: white;
+}
