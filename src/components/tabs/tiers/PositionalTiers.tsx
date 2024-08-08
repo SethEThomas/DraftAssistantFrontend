@@ -1,57 +1,79 @@
-import { platform } from "os";
 import { AdpType } from "../../../enums/AdpType.enum";
 import { Platform } from "../../../enums/Platform.enum";
 import { Player } from "../../../interfaces/Player";
 import IndividualTier from "./IndividualTier";
 import './Tiers.css';
+import { Position } from "../../../enums/Position.enum";
+import { Tier } from "../../../interfaces/TierInterface";
+import { useState, useEffect } from "react";
 
 interface PositionalTiersProps {
-    title: string;
-    players: Player[];
-    filterByPosition: string | null;
-    adpType: AdpType;
-    platform: Platform;
+  players: Player[];
+  position: Position;
+  adpType: AdpType;
+  platform: Platform;
+}
+
+const defaultTiers: Tier[] = [
+  {
+    tierName: "Untiered",
+    tierNumber: 0,
+    players: []
   }
-  
-  const PositionalTiers: React.FC<PositionalTiersProps> = ({ title, players, filterByPosition, adpType, platform }) => {
-    const filteredPlayers = filterByPosition
-      ? players.filter(player => player.position === filterByPosition)
+];
+
+const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform }) => {
+  const [tiers, setTiers] = useState<Tier[]>(defaultTiers);
+
+  useEffect(() => {
+    const filteredPlayers = position !== Position.OVERALL
+      ? players.filter(player => player.position === position)
       : players;
-  
-    const groupedByTier: Record<string, Player[]> = filteredPlayers.reduce((acc, player) => {
-      let tier;
-      
-      if (filterByPosition) {
-        tier = player.positionalTier;
-      } else {
-        tier = player.overallTier;
+    const groupedTiers: Tier[] = [];
+    const findOrCreateTier = (tierNumber: number, tierName: string) => {
+      let tier = groupedTiers.find(t => t.tierNumber === tierNumber);
+      if (!tier) {
+        tier = { tierName, tierNumber, players: [] };
+        groupedTiers.push(tier);
       }
-  
-      if (tier < 1) {
-        tier = 'Untiered';
+      return tier;
+    };
+    filteredPlayers.forEach(player => {
+      let tierNumber: number;
+      let tierName: string;
+
+      if (position === Position.OVERALL) {
+        tierNumber = player.overallTier;
       } else {
-        tier = `Tier ${tier}`;
+        tierNumber = player.positionalTier;
       }
-  
-      if (!acc[tier]) acc[tier] = [];
-      acc[tier].push(player);
-      return acc;
-    }, {} as Record<string, Player[]>);
-  
-    return (
-      <div className="positional-tiers">
-        <h2>{title}</h2>
-        {Object.keys(groupedByTier).map((tier) => (
-          <IndividualTier 
-            key={tier} 
-            tier={tier} 
-            players={groupedByTier[tier]} 
-            adpType={adpType} 
-            platform={platform} 
-          />
-        ))}
-      </div>
-    );
-  };
-  
-  export default PositionalTiers;
+
+      if (tierNumber > 0) {
+        tierName = `Tier ${tierNumber}`;
+      } else {
+        tierNumber = 0;
+        tierName = "Untiered";
+      }
+
+      const tier = findOrCreateTier(tierNumber, tierName);
+      tier.players.push(player);
+    });
+    setTiers(groupedTiers);
+  }, [players, position]);
+
+  return (
+    <div className="positional-tiers">
+      <h2>{position}</h2>
+      {tiers.map((tier) => (
+        <IndividualTier 
+          key={tier.tierNumber} 
+          tier={tier} 
+          adpType={adpType} 
+          platform={platform} 
+        />
+      ))}
+    </div>
+  );
+};
+
+export default PositionalTiers;

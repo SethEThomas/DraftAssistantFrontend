@@ -1,22 +1,22 @@
 import { AdpType } from "../../../enums/AdpType.enum";
 import { Platform } from "../../../enums/Platform.enum";
 import { Player } from "../../../interfaces/Player";
+import { Tier } from "../../../interfaces/TierInterface";
 import PlayerDisplaySmall from "../../player/PlayerDisplaySmall";
 import './Tiers.css';
 
 interface IndividualTierProps {
-    tier: string;
-    players: Player[];
+    tier: Tier;
     adpType: AdpType;
     platform: Platform;
 }
 
-const IndividualTier: React.FC<IndividualTierProps> = ({ tier, players, adpType, platform }) => {
+const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform }) => {
     return (
         <div className="individual-tier">
-            <h3>{tier}</h3>
+            <h3>{tier.tierName}</h3>
             <ul>
-                {players.map(player => (
+                {tier.players.map(player => (
                     <li key={player.id}>
                         <PlayerDisplaySmall 
                             player={player} 
