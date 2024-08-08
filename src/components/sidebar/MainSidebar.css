@@ -6,43 +6,38 @@
     border-right: 3px solid #ccc;
     height: 100%;
     flex-shrink: 0;
-    overflow-y: auto; /* Allow vertical scrolling */
-    position: relative; /* Needed for positioning the spinner */
-    transition: width 0.3s; /* Smooth transition for collapsing */
+    overflow-y: auto;
+    position: relative;
+    transition: width 0.3s;
 }
 
-/* Collapsed state styling */
 .sidebar.collapsed {
-    width: 10px; /* Width when collapsed */
+    width: 10px;
 }
 
-/* Center toggle button on the right border */
 .sidebar .toggle-btn {
     position: absolute;
     top: 50%;
-    right: -10px; /* Adjust based on your design needs */
-    transform: translateY(-50%); /* Center vertically */
+    right: -10px;
+    transform: translateY(-50%);
     background-color: #444;
     border: none;
     color: #fff;
     padding: 5px;
     cursor: pointer;
-    z-index: 1; /* Ensure button is clickable */
-    border-radius: 0 4px 4px 0; /* Rounded corners on the right */
+    z-index: 1;
+    border-radius: 0 4px 4px 0;
 }
 
-/* Hover effect for toggle button */
 .sidebar .toggle-btn:hover {
     background-color: #555;
 }
 
-/* Hide search and filter inputs when collapsed */
 .sidebar.collapsed .search-input,
 .sidebar.collapsed .position-filter {
     display: none;
 }
 
-/* Loading spinner styling */
 .sidebar .loading-container {
     position: absolute;
     top: 50%;
@@ -52,19 +47,19 @@
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center; /* Center vertically */
-    justify-content: center; /* Center horizontally */
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar .dots-container {
     display: flex;
-    gap: 0.5rem; /* Space between dots */
+    gap: 0.5rem;
 }
 
 .sidebar .dot {
     width: 1rem;
     height: 1rem;
-    background-color: #8cb6f5; /* Color of the dots */
+    background-color: #8cb6f5;
     border-radius: 50%;
     animation: dot-blink 1.5s infinite ease-in-out;
 }

@@ -62,18 +62,15 @@
     width: 100%;
 }
 
-/* Player info styling */
 .player-info {
     display: flex;
     flex-direction: column;
 }
 
-/* Player name styling */
 .player-name {
     font-weight: bold;
 }
 
-/* Player team position styling */
 .player-team-position {
     font-size: 0.9rem;
     color: #666;

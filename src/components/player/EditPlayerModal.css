@@ -58,7 +58,7 @@
     border-radius: 4px;
     background: #444;
     color: #fff;
-    appearance: textfield; /* Ensure that the number arrows are visible */
+    appearance: textfield;
 }
 
 .modal-body input[type="number"]::-webkit-inner-spin-button,
