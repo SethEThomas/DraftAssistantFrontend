@@ -128,6 +128,7 @@ function App() {
                     adpType={draftSettings.displayAdpType} 
                     platform={draftSettings.displayAdpPlatform}
                     onUpdatePlayer={handleUpdatePlayer}
+                    setPlayers={setPlayers}
                   />
                 } 
               />

@@ -11,9 +11,10 @@ interface TiersProps {
   adpType: AdpType;
   platform: Platform;
   onUpdatePlayer: (player: Player) => void;
+  setPlayers: (players: Player[]) => void;
 }
 
-const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlayer }) => {
+const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlayer, setPlayers }) => {
   const [isLocked, setIsLocked] = useState(true);
 
   const toggleLock = () => {
@@ -32,6 +33,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         platform={platform} 
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
+        setPlayers={setPlayers}
       />
       <PositionalTiers 
         players={players} 
@@ -40,6 +42,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         platform={platform} 
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
+        setPlayers={setPlayers}
       />
       <PositionalTiers 
         players={players} 
@@ -48,6 +51,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         platform={platform} 
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
+        setPlayers={setPlayers}
       />
       <PositionalTiers 
         players={players} 
@@ -56,6 +60,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         platform={platform} 
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
+        setPlayers={setPlayers}
       />
       <PositionalTiers 
         players={players} 
@@ -64,6 +69,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         platform={platform} 
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
+        setPlayers={setPlayers}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import './Tiers.css';
 import { Position } from "../../../enums/Position.enum";
 import { Tier } from "../../../interfaces/TierInterface";
 import { useState, useEffect } from "react";
-import { CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, rectIntersection } from "@dnd-kit/core";
+import { Active, CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, Over, closestCenter, rectIntersection } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import { DroppableType } from "../../../enums/DroppableType.enum";
@@ -19,6 +19,7 @@ interface PositionalTiersProps {
   platform: Platform;
   isLocked: boolean;
   onUpdatePlayer: (player: Player) => void;
+  setPlayers: (players: Player[]) => void;
 }
 
 const defaultTiers: Tier[] = [
@@ -69,7 +70,7 @@ const getDraggableIdAndType = (id: string): { type: DroppableType, id: number } 
   return { type, id: calculatedId };
 };
 
-const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer }) => {
+const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer, setPlayers }) => {
   const DraggableItem = ({ fullId }: { fullId: string }) => {
     const {type, id} = getDraggableIdAndType(fullId);
     const player = players.find(p => p.id === id);
@@ -147,24 +148,103 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
     if (!over || active.id === over.id) {
         return;
     }
-    const { type: activeType, id: activeId } = getDraggableIdAndType(active.id as string);
+    const { id: activeId } = getDraggableIdAndType(active.id as string);
     const { type: overType, id: overId } = getDraggableIdAndType(over.id as string);
-    console.log(`Dragged over ${overType}`);
-    const overTierNumber = over.data?.current?.tierNumber;
-    const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
-    if (overTier) {
-        const activePlayer = players.find(player => player.id === activeId);
-
-        if (activePlayer) {
-            const updatedPlayer = position === Position.OVERALL
-                ? { ...activePlayer, overallTier: overTier.tierNumber }
-                : { ...activePlayer, positionalTier: overTier.tierNumber };
-
-            onUpdatePlayer(updatedPlayer);
-        }
+    if(overType === DroppableType.TIER){
+      doTierUpdate(active, over, activeId);
+    }
+    else if(overType === DroppableType.PLAYER){
+      doPlayerUpdate(activeId, overId);
+    }
+    else{
+      console.log(`Player dropped over undroppable location`);
     }
     setActiveId(null);
   };
+
+  const doTierUpdate = (active: Active, over: Over, activeId: number): void => {
+      const overTierNumber = over.data?.current?.tierNumber;
+      const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
+      if (overTier) {
+          const activePlayer = players.find(player => player.id === activeId);
+
+          if (activePlayer) {
+              const updatedPlayer = position === Position.OVERALL
+                  ? { ...activePlayer, overallTier: overTier.tierNumber }
+                  : { ...activePlayer, positionalTier: overTier.tierNumber };
+
+              onUpdatePlayer(updatedPlayer);
+          }
+      }
+  }
+
+  const doPlayerUpdate = (activeId: number, overId: number): void => {
+    const activePlayer = players.find(player => player.id === activeId) || null;
+    const overPlayer = players.find(player => player.id === overId) || null;
+    if(activePlayer && overPlayer){
+      if(position === Position.OVERALL){
+        activePlayer.overallTier = overPlayer.overallTier;
+      }
+      else{
+        activePlayer.positionalTier = overPlayer.positionalTier;
+      }
+      const activePlayerRank = position === Position.OVERALL ? activePlayer.overallRank : activePlayer.positionalRank;
+      const overPlayerRank = position === Position.OVERALL ? overPlayer.overallRank : overPlayer.positionalRank;
+      if(activePlayerRank > overPlayerRank){
+        movePlayerUp(activePlayer, overPlayer);
+      }
+      else{
+        movePlayerDown(activePlayer, overPlayer);
+      }
+    }
+  }
+
+  const movePlayerUp = (activePlayer: Player, overPlayer: Player): void => {
+    const updatedPlayers = players.map(player => {
+        let rankField: keyof Player;
+        if (position === Position.OVERALL) {
+            rankField = "overallRank";
+        } else {
+            rankField = "positionalRank";
+        }
+
+        if (player.id === activePlayer.id) {
+            return { ...player, [rankField]: overPlayer[rankField] };
+        } else if (
+            player[rankField] >= overPlayer[rankField] &&
+            player[rankField] < activePlayer[rankField]
+        ) {
+            return { ...player, [rankField]: player[rankField] + 1 };
+        }
+        return player;
+    });
+
+    setPlayers(updatedPlayers);
+};
+
+const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
+    const updatedPlayers = players.map(player => {
+        let rankField: keyof Player;
+        if (position === Position.OVERALL) {
+            rankField = "overallRank";
+        } else {
+            rankField = "positionalRank";
+        }
+
+        if (player.id === activePlayer.id) {
+            return { ...player, [rankField]: overPlayer[rankField] };
+        } else if (
+            player[rankField] <= overPlayer[rankField] &&
+            player[rankField] > activePlayer[rankField]
+        ) {
+            return { ...player, [rankField]: player[rankField] - 1 };
+        }
+        return player;
+    });
+
+    setPlayers(updatedPlayers);
+};
+
 
   
   return (
@@ -185,7 +265,8 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
                 key={tier.tierNumber} 
                 tier={tier} 
                 adpType={adpType} 
-                platform={platform} 
+                platform={platform}
+                position={position}
               />
             ))
         ) : (
@@ -202,6 +283,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
                     tier={tier} 
                     adpType={adpType} 
                     platform={platform}
+                    position={position}
                   />
                 ))}
             </SortableContext>
@@ -224,6 +306,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
                     tier={tier} 
                     adpType={adpType} 
                     platform={platform}
+                    position={position}
                   />
                 ))}
             </SortableContext>
