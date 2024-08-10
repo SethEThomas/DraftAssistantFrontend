@@ -58,7 +58,7 @@
   }
   
   .empty-tier-placeholder {
-    height: 300px;
+    height: 200px;
     border: 2px dotted lightblue;
     display: flex;
     justify-content: center;
@@ -122,4 +122,36 @@
 
 .individual-tier.over-non-empty {
   border: 2px dashed blue;
+}
+
+.drag-overlay {
+  background-color: #2f2f2f;
+  color: #8cb6f5;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #8cb6f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-size: 0.9rem;
+  position: absolute;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.individual-tier::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px dashed transparent;
+  pointer-events: none;
+}
+
+.individual-tier.over-empty::before {
+  border-color: green;
+}
+
+.individual-tier.over-non-empty::before {
+  border-color: blue;
 }

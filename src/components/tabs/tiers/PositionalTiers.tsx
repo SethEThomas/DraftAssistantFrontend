@@ -6,8 +6,9 @@ import './Tiers.css';
 import { Position } from "../../../enums/Position.enum";
 import { Tier } from "../../../interfaces/TierInterface";
 import { useState, useEffect } from "react";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, closestCorners } from "@dnd-kit/core";
+import { CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, rectIntersection } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { snapCenterToCursor } from "@dnd-kit/modifiers";
 
 
 interface PositionalTiersProps {
@@ -27,23 +28,49 @@ const defaultTiers: Tier[] = [
   }
 ];
 
+const fixCursorSnapOffset: CollisionDetection = (args) => {
+  // Bail out if keyboard activated
+  if (!args.pointerCoordinates) {
+    return rectIntersection(args);
+  }
+  const { x, y } = args.pointerCoordinates;
+  const { width, height } = args.collisionRect;
+  const updated = {
+    ...args,
+    // The collision rectangle is broken when using snapCenterToCursor. Reset
+    // the collision rectangle based on pointer location and overlay size.
+    collisionRect: {
+      width,
+      height,
+      bottom: y + height / 2,
+      left: x - width / 2,
+      right: x + width / 2,
+      top: y - height / 2,
+    },
+  };
+  return rectIntersection(updated);
+};
+
+
 const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer }) => {
+  const DraggableItem = ({ id }: { id: number }) => {
+    const player = players.find(p => p.id === id);
+    return player ? (
+      <div className="drag-overlay">
+        {player.firstName} {player.lastName}
+      </div>
+    ) : null;
+  };
   const [tiers, setTiers] = useState<Tier[]>(defaultTiers);
-  const [activeId, setActiveId] = useState(-1);
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   useEffect(() => {
     const filteredPlayers = position !== Position.OVERALL
       ? players.filter(player => player.position === position)
       : players;
-    const groupedTiers: Tier[] = [];
-    const findOrCreateTier = (tierNumber: number, tierName: string) => {
-      let tier = groupedTiers.find(t => t.tierNumber === tierNumber);
-      if (!tier) {
-        tier = { tierName, tierNumber, players: [] };
-        groupedTiers.push(tier);
-      }
-      return tier;
-    };
+
+    const groupedTiers: { [key: number]: Tier } = {};
+
     filteredPlayers.forEach(player => {
       let tierNumber: number;
       let tierName: string;
@@ -61,10 +88,22 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
         tierName = "Untiered";
       }
 
-      const tier = findOrCreateTier(tierNumber, tierName);
-      tier.players.push(player);
+      if (!groupedTiers[tierNumber]) {
+        groupedTiers[tierNumber] = { tierName, tierNumber, players: [] };
+      }
+
+      groupedTiers[tierNumber].players.push(player);
     });
-    setTiers(groupedTiers);
+
+    const maxTierNumber = Math.max(...Object.keys(groupedTiers).map(Number), 0);
+    for (let i = 1; i <= maxTierNumber; i++) {
+      if (!groupedTiers[i]) {
+        groupedTiers[i] = { tierName: `Tier ${i}`, tierNumber: i, players: [] };
+      }
+    }
+    const sortedTiers = Object.values(groupedTiers).sort((a, b) => a.tierNumber - b.tierNumber);
+
+    setTiers(sortedTiers);
   }, [players, position]);
 
   const addTier = () => {
@@ -83,7 +122,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     setActiveId(active.id as number);
-  }
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -106,61 +145,83 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
             onUpdatePlayer(updatedPlayer);
         }
     }
-};
+    setActiveId(null);
+  };
 
-
+  
   return (
     <div className="positional-tiers">
       <h2>{position}</h2>
 
-      {isLocked ? (
-        tiers
-          .filter((tier) => tier.tierNumber !== 0 && tier.players.length > 0)
-          .map((tier) => (
-            <IndividualTier 
-              key={tier.tierNumber} 
-              tier={tier} 
-              adpType={adpType} 
-              platform={platform} 
-            />
-          ))
-      ) : (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-          <SortableContext items={tiers.filter(tier => tier.tierNumber !== 0).flatMap(tier => tier.players.map(player => player.id))} strategy={verticalListSortingStrategy}>
-            {tiers
-              .filter((tier) => tier.tierNumber !== 0)
-              .map((tier) => (
-                <IndividualTier 
-                  key={tier.tierNumber} 
-                  tier={tier} 
-                  adpType={adpType} 
-                  platform={platform}
-                />
-              ))}
-          </SortableContext>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
+        autoScroll={{layoutShiftCompensation: false, threshold: { x: 0, y: 0.05 }}}
+      >
+        {isLocked ? (
+          tiers
+            .filter((tier) => tier.tierNumber !== 0 && tier.players.length > 0)
+            .map((tier) => (
+              <IndividualTier 
+                key={tier.tierNumber} 
+                tier={tier} 
+                adpType={adpType} 
+                platform={platform} 
+              />
+            ))
+        ) : (
+          <>
+            <SortableContext
+              items={tiers.filter(tier => tier.tierNumber !== 0).flatMap(tier => tier.players.map(player => player.id))}
+              strategy={verticalListSortingStrategy}
+            >
+              {tiers
+                .filter((tier) => tier.tierNumber !== 0)
+                .map((tier) => (
+                  <IndividualTier 
+                    key={tier.tierNumber} 
+                    tier={tier} 
+                    adpType={adpType} 
+                    platform={platform}
+                  />
+                ))}
+            </SortableContext>
 
-          <div className="add-tier-container">
-            <div className="add-tier-text" onClick={addTier}>
-              Add Tier +
+            <div className="add-tier-container">
+              <div className="add-tier-text" onClick={addTier}>
+                Add Tier +
+              </div>
             </div>
-          </div>
 
-          <SortableContext items={tiers.find(tier => tier.tierNumber === 0)?.players.map(player => player.id) || []} strategy={verticalListSortingStrategy}>
-            {tiers
-              .filter((tier) => tier.tierNumber === 0)
-              .map((tier) => (
-                <IndividualTier 
-                  key={tier.tierNumber} 
-                  tier={tier} 
-                  adpType={adpType} 
-                  platform={platform}
-                />
-              ))}
-          </SortableContext>
-        </DndContext>
-      )}
+            <SortableContext
+              items={tiers.find(tier => tier.tierNumber === 0)?.players.map(player => player.id) || []}
+              strategy={verticalListSortingStrategy}
+            >
+              {tiers
+                .filter((tier) => tier.tierNumber === 0)
+                .map((tier) => (
+                  <IndividualTier 
+                    key={tier.tierNumber} 
+                    tier={tier} 
+                    adpType={adpType} 
+                    platform={platform}
+                  />
+                ))}
+            </SortableContext>
+          </>
+        )}
+
+        <DragOverlay modifiers={[snapCenterToCursor]}>
+          {activeId ? <DraggableItem id={activeId} /> : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 };
 
 export default PositionalTiers;
+
+function createSnapModifier(gridSize: number) {
+  throw new Error("Function not implemented.");
+}
