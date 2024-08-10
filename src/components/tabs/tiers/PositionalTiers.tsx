@@ -163,20 +163,58 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
   };
 
   const doTierUpdate = (active: Active, over: Over, activeId: number): void => {
-      const overTierNumber = over.data?.current?.tierNumber;
-      const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
-      if (overTier) {
-          const activePlayer = players.find(player => player.id === activeId);
+    const overTierNumber = over.data?.current?.tierNumber;
+    const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
+    if (overTier) {
+        const activePlayer = players.find(player => player.id === activeId);
 
-          if (activePlayer) {
-              const updatedPlayer = position === Position.OVERALL
-                  ? { ...activePlayer, overallTier: overTier.tierNumber }
-                  : { ...activePlayer, positionalTier: overTier.tierNumber };
+        if (activePlayer) {
+            const currentTierIndex = tiers.findIndex(tier => tier.tierNumber === overTierNumber);
+            const rankField: keyof Player = position === Position.OVERALL ? 'overallRank' : 'positionalRank';
 
-              onUpdatePlayer(updatedPlayer);
-          }
-      }
-  }
+            let newRank: number;
+
+            if (overTier.players.length > 0) {
+                const highestRankInOverTier = Math.max(...overTier.players.map(player => player[rankField] as number));
+                newRank = highestRankInOverTier + 1;
+            } else {
+                let tierAbove = null;
+                for (let i = currentTierIndex - 1; i >= 0; i--) {
+                    if (tiers[i].players.length > 0) {
+                        tierAbove = tiers[i];
+                        break;
+                    }
+                }
+                let tierBelow = null;
+                for (let i = currentTierIndex + 1; i < tiers.length; i++) {
+                    if (tiers[i].players.length > 0) {
+                        tierBelow = tiers[i];
+                        break;
+                    }
+                }
+
+                if (tierAbove) {
+                    const lastPlayerInTierAbove = tierAbove.players[tierAbove.players.length - 1] as Player;
+                    newRank = lastPlayerInTierAbove ? (lastPlayerInTierAbove[rankField] as number) + 1 : 1;
+                } else if (tierBelow) {
+                    const bestRankInTierBelow = Math.min(...tierBelow.players.map(player => player[rankField] as number));
+                    newRank = bestRankInTierBelow + 1;
+                } else {
+                    newRank = 1;
+                }
+            }
+
+            const updatedPlayer = position === Position.OVERALL
+                ? { ...activePlayer, overallTier: overTierNumber, overallRank: newRank }
+                : { ...activePlayer, positionalTier: overTierNumber, positionalRank: newRank };
+
+            onUpdatePlayer(updatedPlayer);
+        }
+    }
+};
+
+
+
 
   const doPlayerUpdate = (activeId: number, overId: number): void => {
     const activePlayer = players.find(player => player.id === activeId) || null;
@@ -190,7 +228,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
       }
       const activePlayerRank = position === Position.OVERALL ? activePlayer.overallRank : activePlayer.positionalRank;
       const overPlayerRank = position === Position.OVERALL ? overPlayer.overallRank : overPlayer.positionalRank;
-      if(activePlayerRank > overPlayerRank){
+      if(activePlayerRank > overPlayerRank || activePlayerRank === 0){
         movePlayerUp(activePlayer, overPlayer);
       }
       else{
@@ -212,7 +250,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
             return { ...player, [rankField]: overPlayer[rankField] };
         } else if (
             player[rankField] >= overPlayer[rankField] &&
-            player[rankField] < activePlayer[rankField]
+            player[rankField] < (activePlayer[rankField] === 0 ? 9999 : activePlayer[rankField])
         ) {
             return { ...player, [rankField]: player[rankField] + 1 };
         }
@@ -220,7 +258,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
     });
 
     setPlayers(updatedPlayers);
-};
+  };
 
 const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
     const updatedPlayers = players.map(player => {
@@ -235,7 +273,7 @@ const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
             return { ...player, [rankField]: overPlayer[rankField] };
         } else if (
             player[rankField] <= overPlayer[rankField] &&
-            player[rankField] > activePlayer[rankField]
+            player[rankField] > (activePlayer[rankField] === 0 ? 9999 : activePlayer[rankField])
         ) {
             return { ...player, [rankField]: player[rankField] - 1 };
         }
