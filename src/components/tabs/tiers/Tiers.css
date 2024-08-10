@@ -36,6 +36,9 @@
     padding: 0.25rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
   }
   
   .individual-tier h3 {
@@ -47,6 +50,7 @@
     list-style: none;
     padding: 0;
     font-size: 0.8rem;
+    overflow: auto;
   }
   
   .individual-tier li {
@@ -54,7 +58,7 @@
   }
   
   .empty-tier-placeholder {
-    height: 100px;
+    height: 300px;
     border: 2px dotted lightblue;
     display: flex;
     justify-content: center;
@@ -110,4 +114,12 @@
 .add-tier-text:hover::before,
 .add-tier-text:hover::after {
   border-color: white;
+}
+
+.individual-tier.over-empty {
+  border: 2px dashed green;
+}
+
+.individual-tier.over-non-empty {
+  border: 2px dashed blue;
 }

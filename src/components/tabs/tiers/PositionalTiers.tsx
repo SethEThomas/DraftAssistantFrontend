@@ -6,6 +6,9 @@ import './Tiers.css';
 import { Position } from "../../../enums/Position.enum";
 import { Tier } from "../../../interfaces/TierInterface";
 import { useState, useEffect } from "react";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, closestCorners } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
 
 interface PositionalTiersProps {
   players: Player[];
@@ -13,6 +16,7 @@ interface PositionalTiersProps {
   adpType: AdpType;
   platform: Platform;
   isLocked: boolean;
+  onUpdatePlayer: (player: Player) => void;
 }
 
 const defaultTiers: Tier[] = [
@@ -23,8 +27,9 @@ const defaultTiers: Tier[] = [
   }
 ];
 
-const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked }) => {
+const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer }) => {
   const [tiers, setTiers] = useState<Tier[]>(defaultTiers);
+  const [activeId, setActiveId] = useState(-1);
 
   useEffect(() => {
     const filteredPlayers = position !== Position.OVERALL
@@ -75,38 +80,85 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
     setTiers([...tiers, newTier]);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    setActiveId(active.id as number);
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+        return;
+    }
+
+    const overTierNumber = over.data?.current?.tierNumber;
+    const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
+
+    if (overTier) {
+        const activePlayer = players.find(player => player.id === active.id);
+
+        if (activePlayer) {
+            const updatedPlayer = position === Position.OVERALL
+                ? { ...activePlayer, overallTier: overTier.tierNumber }
+                : { ...activePlayer, positionalTier: overTier.tierNumber };
+
+            onUpdatePlayer(updatedPlayer);
+        }
+    }
+};
+
+
   return (
     <div className="positional-tiers">
       <h2>{position}</h2>
-      {tiers
-        .filter((tier) => tier.tierNumber !== 0)
-        .map((tier) => (
-          <IndividualTier 
-            key={tier.tierNumber} 
-            tier={tier} 
-            adpType={adpType} 
-            platform={platform} 
-          />
-        ))
-      }
-      {!isLocked && (
-        <div className="add-tier-container">
-          <div className="add-tier-text" onClick={addTier}>
-            Add Tier +
+
+      {isLocked ? (
+        tiers
+          .filter((tier) => tier.tierNumber !== 0 && tier.players.length > 0)
+          .map((tier) => (
+            <IndividualTier 
+              key={tier.tierNumber} 
+              tier={tier} 
+              adpType={adpType} 
+              platform={platform} 
+            />
+          ))
+      ) : (
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+          <SortableContext items={tiers.filter(tier => tier.tierNumber !== 0).flatMap(tier => tier.players.map(player => player.id))} strategy={verticalListSortingStrategy}>
+            {tiers
+              .filter((tier) => tier.tierNumber !== 0)
+              .map((tier) => (
+                <IndividualTier 
+                  key={tier.tierNumber} 
+                  tier={tier} 
+                  adpType={adpType} 
+                  platform={platform}
+                />
+              ))}
+          </SortableContext>
+
+          <div className="add-tier-container">
+            <div className="add-tier-text" onClick={addTier}>
+              Add Tier +
+            </div>
           </div>
-        </div>
+
+          <SortableContext items={tiers.find(tier => tier.tierNumber === 0)?.players.map(player => player.id) || []} strategy={verticalListSortingStrategy}>
+            {tiers
+              .filter((tier) => tier.tierNumber === 0)
+              .map((tier) => (
+                <IndividualTier 
+                  key={tier.tierNumber} 
+                  tier={tier} 
+                  adpType={adpType} 
+                  platform={platform}
+                />
+              ))}
+          </SortableContext>
+        </DndContext>
       )}
-      {tiers
-        .filter((tier) => tier.tierNumber === 0)
-        .map((tier) => (
-          <IndividualTier 
-            key={tier.tierNumber} 
-            tier={tier} 
-            adpType={adpType} 
-            platform={platform} 
-          />
-        ))
-      }
     </div>
   );
 };

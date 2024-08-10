@@ -126,7 +126,8 @@ function App() {
                   <Tiers 
                     players={players} 
                     adpType={draftSettings.displayAdpType} 
-                    platform={draftSettings.displayAdpPlatform} 
+                    platform={draftSettings.displayAdpPlatform}
+                    onUpdatePlayer={handleUpdatePlayer}
                   />
                 } 
               />

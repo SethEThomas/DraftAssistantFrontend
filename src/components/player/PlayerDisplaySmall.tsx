@@ -6,6 +6,8 @@ import { Player } from '../../interfaces/Player';
 import { formatNumber } from '../../util/FormatUtil';
 import './PlayerDisplaySmall.css';
 import { renderStarRating } from './StarRating';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface PlayerDisplaySmallProps {
     player: Player;
@@ -31,14 +33,21 @@ const toCamelCase = (str: string) => {
 };
 
 const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id: player.id});
     const backgroundColor = positionColorMapping[player.position];
     const adpField = `${Platform[platform].toLowerCase()}${toCamelCase(AdpType[adpType])}`;
     const adpValue = (player.adp as any)[adpField];
     const platformLabel = Platform[platform].replace(/_/g, ' ');
     const adpTypeLabel = AdpType[adpType].replace(/_/g, ' ');
 
+    const transitionStyle = {
+        transition,
+        transform: CSS.Transform.toString(transform),
+        opacity: isDragging ? 0.7 : 1
+    }
+
     return (
-        <div className="player-display-small" style={{ backgroundColor }}>
+        <div className="player-display-small" style={{ backgroundColor, ...transitionStyle }} ref={ setNodeRef } { ...attributes } { ...listeners }>
             <div className="left-column">
                 <div className="player-name">{player.firstName} {player.lastName}</div>
                 <div className="player-position">{player.position} {player.teamAbbreviation}</div>
