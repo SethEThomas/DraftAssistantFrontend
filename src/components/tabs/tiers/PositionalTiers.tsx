@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, rectIntersection } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
+import { DroppableType } from "../../../enums/DroppableType.enum";
 
 
 interface PositionalTiersProps {
@@ -29,7 +30,6 @@ const defaultTiers: Tier[] = [
 ];
 
 const fixCursorSnapOffset: CollisionDetection = (args) => {
-  // Bail out if keyboard activated
   if (!args.pointerCoordinates) {
     return rectIntersection(args);
   }
@@ -37,8 +37,6 @@ const fixCursorSnapOffset: CollisionDetection = (args) => {
   const { width, height } = args.collisionRect;
   const updated = {
     ...args,
-    // The collision rectangle is broken when using snapCenterToCursor. Reset
-    // the collision rectangle based on pointer location and overlay size.
     collisionRect: {
       width,
       height,
@@ -51,9 +49,29 @@ const fixCursorSnapOffset: CollisionDetection = (args) => {
   return rectIntersection(updated);
 };
 
+const getDraggableIdAndType = (id: string): { type: DroppableType, id: number } => {
+  const [prefix, idString] = id.split('-');
+  const calculatedId = parseInt(idString, 10);
+
+  let type: DroppableType;
+
+  switch (prefix.toLowerCase()) {
+    case 'player':
+      type = DroppableType.PLAYER;
+      break;
+    case 'tier':
+      type = DroppableType.TIER;
+      break;
+    default:
+      throw new Error(`Unknown prefix: ${prefix}`);
+  }
+
+  return { type, id: calculatedId };
+};
 
 const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer }) => {
-  const DraggableItem = ({ id }: { id: number }) => {
+  const DraggableItem = ({ fullId }: { fullId: string }) => {
+    const {type, id} = getDraggableIdAndType(fullId);
     const player = players.find(p => p.id === id);
     return player ? (
       <div className="drag-overlay">
@@ -62,7 +80,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
     ) : null;
   };
   const [tiers, setTiers] = useState<Tier[]>(defaultTiers);
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     const filteredPlayers = position !== Position.OVERALL
@@ -121,21 +139,21 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    setActiveId(active.id as number);
+    setActiveId(active.id as string);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (!over || active.id === over.id) {
         return;
     }
-
+    const { type: activeType, id: activeId } = getDraggableIdAndType(active.id as string);
+    const { type: overType, id: overId } = getDraggableIdAndType(over.id as string);
+    console.log(`Dragged over ${overType}`);
     const overTierNumber = over.data?.current?.tierNumber;
     const overTier = tiers.find(tier => tier.tierNumber === overTierNumber);
-
     if (overTier) {
-        const activePlayer = players.find(player => player.id === active.id);
+        const activePlayer = players.find(player => player.id === activeId);
 
         if (activePlayer) {
             const updatedPlayer = position === Position.OVERALL
@@ -213,7 +231,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
         )}
 
         <DragOverlay modifiers={[snapCenterToCursor]}>
-          {activeId ? <DraggableItem id={activeId} /> : null}
+          {activeId ? <DraggableItem fullId={activeId} /> : null}
         </DragOverlay>
       </DndContext>
     </div>

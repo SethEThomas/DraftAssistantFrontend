@@ -33,7 +33,7 @@ const toCamelCase = (str: string) => {
 };
 
 const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform }) => {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id: player.id});
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id: `player-${player.id}`});
     const backgroundColor = positionColorMapping[player.position];
     const adpField = `${Platform[platform].toLowerCase()}${toCamelCase(AdpType[adpType])}`;
     const adpValue = (player.adp as any)[adpField];
