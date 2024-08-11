@@ -15,6 +15,7 @@ import { Platform } from './enums/Platform.enum';
 import { DraftSettingsInterface } from './interfaces/DraftSettingsInterface';
 import { Position } from './enums/Position.enum';
 import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
+import { TeamInterface } from './interfaces/TeamInterface';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 12,
@@ -40,6 +41,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
   const [updating, setUpdating] = useState(false);
+  const [teams, setTeams] = useState<TeamInterface[]>([]);
 
   useEffect(() => {
     axios.get<Player[]>(BACKEND_URL + '/players')
@@ -64,11 +66,36 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    const newTeams: TeamInterface[] = Array.from({ length: draftSettings.numTeams }, (_, index) => ({
+      teamId: index + 1,
+      players: []
+    }));
+    setTeams(currentTeams => {
+      const updatedTeams = newTeams.map(newTeam => {
+        const existingTeam = currentTeams.find(team => team.teamId === newTeam.teamId);
+        return {
+          ...newTeam,
+          players: existingTeam ? existingTeam.players : []
+        };
+      });
+      return updatedTeams;
+    });
+  }, [draftSettings.numTeams]);
+
   const handleUpdatePlayer = (updatedPlayer: Player) => {
     setPlayers((prevPlayers) =>
       prevPlayers.map((player) =>
         player.id === updatedPlayer.id ? updatedPlayer : player
       )
+    );
+    setTeams(currentTeams =>
+      currentTeams.map(team => ({
+        ...team,
+        players: team.players.map(player =>
+          player.id === updatedPlayer.id ? updatedPlayer : player
+        )
+      }))
     );
   };
 
@@ -119,7 +146,7 @@ function App() {
             <Routes>
               <Route path="/" element={<DraftBoard players={players} />} />
               <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
-              <Route path="/teams" element={<Teams />} />
+              <Route path="/teams" element={<Teams teams={teams} draftSettings={draftSettings} />} />
               <Route 
                 path="/tiers" 
                 element={

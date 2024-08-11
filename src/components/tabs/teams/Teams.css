@@ -1,0 +1,62 @@
+.teams-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Reduced gap between teams */
+    justify-content: space-around;
+    background-color: #222;
+    padding: 20px;
+    height: 100vh; /* Set a fixed height for the container */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+  
+  .individual-team {
+    background-color: #333;
+    color: #fff;
+    padding: 5px; /* Reduced padding */
+    margin: 5px; /* Reduced margin between teams */
+    flex: 1 1 calc(20% - 5px); /* Wider teams with reduced space between them */
+    box-sizing: border-box;
+    border-radius: 8px;
+    max-width: 180px; /* Set a max width for wider teams */
+  }
+  
+  .players-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* One DraftedPlayer per row */
+    gap: 2px; /* Reduced gap between players */
+    margin-top: 1rem;
+  }
+  
+  .team-needs {
+    margin-top: 5px; /* Reduced margin */
+    color: #8cb6f5;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .drafted-player {
+    background-color: #444;
+    color: #fff;
+    border-radius: 4px;
+    text-align: center;
+    padding: 5px; /* Reduced padding */
+    margin: 2px 0; /* Reduced margin */
+    border: none; /* Removed border */
+    font-size: 0.85rem; /* Slightly smaller font size */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .individual-team {
+      flex: 1 1 calc(25% - 20px); /* Adjust for medium screens */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .individual-team {
+      flex: 1 1 calc(33.333% - 20px); /* Adjust for small screens */
+    }
+  }
+  

@@ -15,14 +15,16 @@ interface PlayerDisplaySmallProps {
     platform: Platform;
 }
 
-const positionColorMapping: { [key in Position]: string } = {
-    OVERALL: 'black',
-    QB: 'darkred',
-    WR: 'darkblue',
-    TE: 'darkorange',
-    RB: 'darkgreen',
-    UNKNOWN: 'gray'
-};
+const positionColorMapping: Partial<Record<Position, string>> = {
+    [Position.QB]: 'darkred',
+    [Position.WR]: 'darkblue',
+    [Position.RB]: 'darkgreen',
+    [Position.TE]: 'darkorange',
+  };
+  
+  const getColorForPosition = (position: Position): string => {
+    return positionColorMapping[position] || 'gray';
+  };
 
 const toCamelCase = (str: string) => {
     return str

@@ -4,5 +4,7 @@ export enum Position{
     WR = "WR",
     TE = "TE",
     RB = "RB",
-    UNKNOWN = "UNKNOWN"
+    UNKNOWN = "UNKNOWN",
+    BENCH = "BENCH",
+    FLEX="FLEX",
 }
