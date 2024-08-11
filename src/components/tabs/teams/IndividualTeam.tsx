@@ -91,8 +91,6 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
 
     return needs.length > 0 ? `NEEDS: ${needs.join(", ")}` : "FULL";
   };
-
-  // Determine if this team should have a gold border
   const borderClass = team.teamId === draftSettings.myTeam ? "gold-border" : "";
 
   return (

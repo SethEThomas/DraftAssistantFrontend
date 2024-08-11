@@ -2,12 +2,14 @@
     display: flex;
     flex-direction: row;
     border: 1px solid black;
-    padding: 8px;
     color: lightgray;
     font-size: 14px;
     box-sizing: border-box;
-    overflow: hidden;
-    align-items: flex-start;
+    position: relative;
+    border-radius: 8px;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .left-column {
@@ -20,6 +22,8 @@
 .player-name {
     font-weight: bold;
     margin-bottom: 4px;
+    display: flex;
+    align-items: center; /* Align items vertically in the row */
 }
 
 .player-position {
@@ -71,12 +75,6 @@
     padding-left: 8px;
 }
 
-@media (max-width: 600px) {
-    .player-display-small {
-        font-size: 12px;
-    }
-}
-
 .star-rating {
     font-size: 1.2em;
     color: gold;
@@ -86,16 +84,48 @@
     display: inline-block;
 }
 
-.player-display-small .left-column .adp-info {
+.adp-info {
+    display: flex;
+    flex-direction: column;
     margin-top: 10px;
     font-size: 14px;
     color: lightgray;
 }
 
-.player-display-small .left-column .adp-info .label {
+.adp-info .label {
     font-weight: bold;
 }
 
-.player-display-small .left-column .adp-info .value {
+.adp-info .value {
     font-weight: normal;
+    margin-right: 10px; /* Space between ADP value and any other elements */
+}
+
+.favorite-icon {
+    font-size: 24px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    margin-left: 10px; /* Space between heart icon and player name */
+    color: black; /* Default color for the heart icon */
+}
+
+.favorite-icon.favorited {
+    color: red; /* Red color for the heart icon when favorited */
+    position: relative; /* Position relative to create the outline */
+}
+
+.favorite-icon.favorited::before {
+    content: "\f004"; /* FontAwesome heart icon */
+    font-family: "Font Awesome 5 Free"; /* Ensure FontAwesome is used */
+    position: absolute; /* Absolute positioning to layer above the icon */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid black; /* Black outline for the heart icon */
+    border-radius: 50%; /* Rounded border for the heart icon */
+    z-index: -1; /* Place the outline behind the heart icon */
+    color: transparent; /* Make sure the before element does not obscure the heart icon */
+    padding: 4px; /* Add padding to ensure the outline does not overlap */
 }

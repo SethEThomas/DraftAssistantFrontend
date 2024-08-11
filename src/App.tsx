@@ -16,6 +16,7 @@ import { DraftSettingsInterface } from './interfaces/DraftSettingsInterface';
 import { Position } from './enums/Position.enum';
 import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
 import { TeamInterface } from './interfaces/TeamInterface';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 12,
@@ -42,6 +43,40 @@ function App() {
   const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
   const [updating, setUpdating] = useState(false);
   const [teams, setTeams] = useState<TeamInterface[]>([]);
+
+  const handleFavoriteToggle = async (playerId: number) => {
+    const updatedPlayers = players.map(player =>
+        player.id === playerId
+            ? { ...player, isSleeper: !player.isSleeper }
+            : player
+    );
+    setPlayers(updatedPlayers);
+    const updatedPlayer = updatedPlayers.find(player => player.id === playerId);
+    if (!updatedPlayer) return;
+    const payload = [
+        {
+            id: updatedPlayer.id,
+            isSleeper: updatedPlayer.isSleeper
+        }
+    ];
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/players/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update favorite status');
+        }
+    } catch (error) {
+        console.error('Error updating favorite status:', error);
+    }
+};
+
 
   useEffect(() => {
     axios.get<Player[]>(BACKEND_URL + '/players')
@@ -141,7 +176,7 @@ function App() {
       <div className="app">
         <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} />
         <div className="main-layout">
-          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} />
+          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle}/>
           <main className="main-content">
             <Routes>
               <Route path="/" element={<DraftBoard players={players} />} />
@@ -156,6 +191,7 @@ function App() {
                     platform={draftSettings.displayAdpPlatform}
                     onUpdatePlayer={handleUpdatePlayer}
                     setPlayers={setPlayers}
+                    onFavoriteToggle={handleFavoriteToggle}
                   />
                 } 
               />

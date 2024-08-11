@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
 import { Position } from '../../enums/Position.enum';
@@ -13,6 +13,7 @@ interface PlayerDisplaySmallProps {
     player: Player;
     adpType: AdpType;
     platform: Platform;
+    onFavoriteToggle: (playerId: number) => void;
 }
 
 const positionColorMapping: Partial<Record<Position, string>> = {
@@ -20,11 +21,11 @@ const positionColorMapping: Partial<Record<Position, string>> = {
     [Position.WR]: 'darkblue',
     [Position.RB]: 'darkgreen',
     [Position.TE]: 'darkorange',
-  };
-  
-  const getColorForPosition = (position: Position): string => {
+};
+
+const getColorForPosition = (position: Position): string => {
     return positionColorMapping[position] || 'gray';
-  };
+};
 
 const toCamelCase = (str: string) => {
     return str
@@ -34,8 +35,9 @@ const toCamelCase = (str: string) => {
         .replace("_","");
 };
 
-const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform }) => {
+const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform, onFavoriteToggle }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id: `player-${player.id}`});
+    const [isFavorite, setIsFavorite] = useState(player.isSleeper);
     const backgroundColor = positionColorMapping[player.position];
     const adpField = `${Platform[platform].toLowerCase()}${toCamelCase(AdpType[adpType])}`;
     const adpValue = (player.adp as any)[adpField];
@@ -45,13 +47,33 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
     const transitionStyle = {
         transition,
         transform: CSS.Transform.toString(transform),
-        opacity: isDragging ? 0.7 : 1
-    }
+        opacity: isDragging ? 0.7 : 1,
+        border: isFavorite ? '2px solid red' : 'none'
+    };
+
+    const handleFavoriteToggle = () => {
+        setIsFavorite(prevState => !prevState);
+        onFavoriteToggle(player.id);
+    };
 
     return (
-        <div className="player-display-small" style={{ backgroundColor, ...transitionStyle }} ref={ setNodeRef } { ...attributes } { ...listeners }>
+        <div
+            className="player-display-small"
+            style={{ backgroundColor, ...transitionStyle }}
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
+        >
             <div className="left-column">
-                <div className="player-name">{player.firstName} {player.lastName}</div>
+                <div className="player-name">
+                    {player.firstName} {player.lastName}
+                    <div
+                        className={`favorite-icon ${isFavorite ? 'favorited' : ''}`}
+                        onClick={handleFavoriteToggle}
+                    >
+                        <i className={isFavorite ? 'fas fa-heart' : 'far fa-heart'}></i>
+                    </div>
+                </div>
                 <div className="player-position">{player.position} {player.teamAbbreviation}</div>
                 <div className="adp-info">
                     <div className="label">{platformLabel} {adpTypeLabel} ADP:</div>
@@ -102,6 +124,6 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
             </div>
         </div>
     );
-}
+};
 
 export default PlayerDisplaySmall;

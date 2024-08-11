@@ -49,7 +49,6 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
         console.error('Invalid dropdown value');
       }
     } else if (name === 'myTeam') {
-      // Ensure myTeam is converted to a number
       setSettings(prevSettings => ({ ...prevSettings, myTeam: Number(newValue) }));
     } else {
       setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));

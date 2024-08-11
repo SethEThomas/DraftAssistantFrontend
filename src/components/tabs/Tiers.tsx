@@ -13,9 +13,10 @@ interface TiersProps {
   platform: Platform;
   onUpdatePlayer: (player: Player) => void;
   setPlayers: (players: Player[]) => void;
+  onFavoriteToggle: (playerId: number) => void;
 }
 
-const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlayer, setPlayers }) => {
+const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlayer, setPlayers, onFavoriteToggle }) => {
   const [isLocked, setIsLocked] = useState(true);
 
   const toggleLock = async () => {
@@ -106,6 +107,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
         setPlayers={setPlayers}
+        onFavoriteToggle={onFavoriteToggle}
       />
       <PositionalTiers 
         players={players} 
@@ -115,6 +117,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
         setPlayers={setPlayers}
+        onFavoriteToggle={onFavoriteToggle}
       />
       <PositionalTiers 
         players={players} 
@@ -124,6 +127,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
         setPlayers={setPlayers}
+        onFavoriteToggle={onFavoriteToggle}
       />
       <PositionalTiers 
         players={players} 
@@ -133,6 +137,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
         setPlayers={setPlayers}
+        onFavoriteToggle={onFavoriteToggle}
       />
       <PositionalTiers 
         players={players} 
@@ -142,6 +147,7 @@ const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlaye
         isLocked={isLocked}
         onUpdatePlayer={onUpdatePlayer}
         setPlayers={setPlayers}
+        onFavoriteToggle={onFavoriteToggle}
       />
     </div>
   );
