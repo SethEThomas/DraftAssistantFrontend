@@ -3,6 +3,9 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 0.5rem;
     position: relative;
+    overflow-y: scroll;
+    height: 100%;
+    width: 100%;
   }
 
   .lock-button {
@@ -65,6 +68,7 @@
     align-items: center;
     color: lightblue;
     font-size: 1rem;
+    z-index: 3;
   }
 
   .add-tier-container {
@@ -154,4 +158,8 @@
 
 .individual-tier.over-non-empty::before {
   border-color: blue;
+}
+
+.lock-scroll {
+  overflow: hidden !important;
 }

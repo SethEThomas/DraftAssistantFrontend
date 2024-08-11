@@ -6,7 +6,7 @@ import './Tiers.css';
 import { Position } from "../../../enums/Position.enum";
 import { Tier } from "../../../interfaces/TierInterface";
 import { useState, useEffect } from "react";
-import { Active, CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, Over, closestCenter, rectIntersection } from "@dnd-kit/core";
+import { Active, CollisionDetection, DndContext, DragEndEvent, DragOverlay, DragStartEvent, Over, closestCenter, closestCorners, rectIntersection } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import { DroppableType } from "../../../enums/DroppableType.enum";
@@ -228,6 +228,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
       }
       const activePlayerRank = position === Position.OVERALL ? activePlayer.overallRank : activePlayer.positionalRank;
       const overPlayerRank = position === Position.OVERALL ? overPlayer.overallRank : overPlayer.positionalRank;
+      if(overPlayerRank === 0) return;
       if(activePlayerRank > overPlayerRank || activePlayerRank === 0){
         movePlayerUp(activePlayer, overPlayer);
       }
@@ -290,7 +291,7 @@ const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
       <h2>{position}</h2>
 
       <DndContext
-        collisionDetection={closestCenter}
+        collisionDetection={rectIntersection}
         onDragEnd={handleDragEnd}
         onDragStart={handleDragStart}
         autoScroll={{layoutShiftCompensation: false, threshold: { x: 0, y: 0.05 }}}
