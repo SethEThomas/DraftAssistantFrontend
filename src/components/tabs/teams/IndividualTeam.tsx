@@ -2,6 +2,7 @@ import { Position } from "../../../enums/Position.enum";
 import { DraftSettingsInterface } from "../../../interfaces/DraftSettingsInterface";
 import { Player } from "../../../interfaces/Player";
 import { TeamInterface } from "../../../interfaces/TeamInterface";
+import { formatNumber } from "../../../util/FormatUtil";
 import DraftedPlayer from "./DraftedPlayer";
 import "./Teams.css";
 
@@ -20,12 +21,12 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
     [Position.FLEX]: flexSlots,
   };
 
-  const sortedPlayers = [...team.players].sort((a, b) => (b.totalProjectedPoints || 0) - (a.totalProjectedPoints || 0));
+  const sortedPlayers = [...team.players].sort((a, b) => (b.totalProjectedPoints ?? 0) - (a.totalProjectedPoints ?? 0));
 
   const getPlayerComponents = (position: Position, count: number) => {
     const playersForPosition = sortedPlayers.filter(player => player.position === position);
     const emptySlots = count - playersForPosition.length;
-    
+
     const playerComponents = playersForPosition.map(player => (
       <DraftedPlayer key={player.id} player={player} position={position} />
     ));
@@ -39,8 +40,17 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
 
   const getFlexAndBenchPlayers = () => {
     const flexOptions = draftSettings.teamSettings.flexOptions.map(opt => opt.toString());
-    const flexPlayers = sortedPlayers.filter(player => flexOptions.includes(player.position));
-    const benchPlayers = sortedPlayers.filter(player => !Object.keys(positions).includes(player.position));
+    const occupiedPositions = new Set(team.players.map(player => player.position));
+
+    const flexPlayers = sortedPlayers.filter(player => 
+      flexOptions.includes(player.position) &&
+      !occupiedPositions.has(player.position)
+    );
+
+    const benchPlayers = sortedPlayers.filter(player => 
+      !Object.keys(positions).includes(player.position) &&
+      !occupiedPositions.has(player.position)
+    );
 
     const flexSlotsAvailable = flexSlots - flexPlayers.length;
     const benchSlotsAvailable = benchSlots - benchPlayers.length;
@@ -60,8 +70,9 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
   const flexAndBench = getFlexAndBenchPlayers();
 
   const totalProjectedPoints = (players: Player[]) =>
-    players.filter(player => player.position !== Position.BENCH)
-           .reduce((acc, player) => acc + (player.totalProjectedPoints || 0), 0);
+    players
+      .filter(player => player.position !== Position.BENCH)
+      .reduce((acc, player) => acc + (player.totalProjectedPoints ?? 0), 0);
 
   const calculateNeeds = () => {
     const needs = [];
@@ -81,8 +92,11 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
     return needs.length > 0 ? `NEEDS: ${needs.join(", ")}` : "FULL";
   };
 
+  // Determine if this team should have a gold border
+  const borderClass = team.teamId === draftSettings.myTeam ? "gold-border" : "";
+
   return (
-    <div className="individual-team">
+    <div className={`individual-team ${borderClass}`}>
       <h2>Team {team.teamId}</h2>
       <p className="team-needs">{calculateNeeds()}</p>
       <div className="players-grid">
@@ -100,7 +114,7 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
         {flexAndBench.emptyBenchSlots}
       </div>
       <div className="team-needs">
-        <p>Season projection: {totalProjectedPoints(team.players)}</p>
+        <p>Season projection: {formatNumber(totalProjectedPoints(team.players))}</p>
       </div>
     </div>
   );

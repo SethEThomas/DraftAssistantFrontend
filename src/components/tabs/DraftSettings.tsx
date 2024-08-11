@@ -28,14 +28,14 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const newValue = type === 'checkbox' && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value;
-    
+
     if (name === 'displayAdpType') {
       const [platformStr, adpTypeStr] = value.split(' ');
-      
+
       if (platformStr && adpTypeStr) {
         const platform = Object.values(Platform).find(p => p === platformStr);
         const adpType = Object.values(AdpType).find(a => a === adpTypeStr);
-  
+
         if (platform && adpType) {
           setSettings(prevSettings => ({
             ...prevSettings,
@@ -48,6 +48,9 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
       } else {
         console.error('Invalid dropdown value');
       }
+    } else if (name === 'myTeam') {
+      // Ensure myTeam is converted to a number
+      setSettings(prevSettings => ({ ...prevSettings, myTeam: Number(newValue) }));
     } else {
       setSettings(prevSettings => ({ ...prevSettings, [name]: newValue }));
     }
@@ -101,7 +104,7 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
                           updatedRosterSettings.wrSlots +
                           updatedRosterSettings.flexSlots +
                           updatedRosterSettings.benchSlots;
-    
+
     setSettings(prevSettings => ({
       ...prevSettings,
       teamSettings: updatedRosterSettings,
@@ -147,12 +150,12 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
             ))}
           </select>
         </label>
-          <label>
-            Number of rounds:
-            <div className="number-of-rounds">
-              {settings.numRounds}
-            </div>
-          </label>
+        <label>
+          Number of rounds:
+          <div className="number-of-rounds">
+            {settings.numRounds}
+          </div>
+        </label>
         <label>
           3rd round reversal:
           <label className="switch">

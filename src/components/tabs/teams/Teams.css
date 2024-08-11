@@ -1,34 +1,35 @@
 .teams-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Reduced gap between teams */
+    gap: 10px;
     justify-content: space-around;
     background-color: #222;
     padding: 20px;
-    height: 100vh; /* Set a fixed height for the container */
-    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100vh;
+    overflow-y: auto;
   }
   
   .individual-team {
     background-color: #333;
     color: #fff;
-    padding: 5px; /* Reduced padding */
-    margin: 5px; /* Reduced margin between teams */
-    flex: 1 1 calc(20% - 5px); /* Wider teams with reduced space between them */
+    padding: 5px;
+    margin: 5px;
+    flex: 1 1 calc(20% - 5px);
     box-sizing: border-box;
     border-radius: 8px;
-    max-width: 180px; /* Set a max width for wider teams */
+    max-width: 180px;
+    border: 1px solid #ccc;
   }
   
   .players-grid {
     display: grid;
-    grid-template-columns: 1fr; /* One DraftedPlayer per row */
-    gap: 2px; /* Reduced gap between players */
+    grid-template-columns: 1fr;
+    gap: 2px;
     margin-top: 1rem;
   }
   
   .team-needs {
-    margin-top: 5px; /* Reduced margin */
+    margin-top: 5px;
     color: #8cb6f5;
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
@@ -41,22 +42,25 @@
     color: #fff;
     border-radius: 4px;
     text-align: center;
-    padding: 5px; /* Reduced padding */
-    margin: 2px 0; /* Reduced margin */
-    border: none; /* Removed border */
-    font-size: 0.85rem; /* Slightly smaller font size */
+    padding: 5px;
+    margin: 2px 0;
+    border: none;
+    font-size: 0.85rem;
   }
   
-  /* Responsive adjustments */
   @media (max-width: 1200px) {
     .individual-team {
-      flex: 1 1 calc(25% - 20px); /* Adjust for medium screens */
+      flex: 1 1 calc(25% - 20px);
     }
   }
   
   @media (max-width: 768px) {
     .individual-team {
-      flex: 1 1 calc(33.333% - 20px); /* Adjust for small screens */
+      flex: 1 1 calc(33.333% - 20px);
     }
+  }
+  
+  .gold-border {
+    border: 2px solid gold;
   }
   

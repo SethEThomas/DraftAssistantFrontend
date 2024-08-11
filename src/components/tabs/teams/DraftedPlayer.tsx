@@ -1,4 +1,5 @@
 import { Player } from "../../../interfaces/Player";
+import { formatNumber } from "../../../util/FormatUtil";
 import "./Teams.css";
 
 interface DraftedPlayerProps {
@@ -10,7 +11,7 @@ interface DraftedPlayerProps {
     return (
       <div className="drafted-player">
         {player ? (
-          <p>{position} - {player.firstName} {player.lastName} ({player.totalProjectedPoints})</p>
+          <p>{position} - {player.firstName} {player.lastName} ({formatNumber(player.stats.totalProjectedPoints)})</p>
         ) : (
           <p>{position} - Empty</p>
         )}
