@@ -195,11 +195,11 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
           }
   
           if (tierAbove) {
-            const lastPlayerInTierAbove = tierAbove.players[tierAbove.players.length - 1] as Player;
-            newRank = lastPlayerInTierAbove ? (lastPlayerInTierAbove[rankField] as number) + 1 : 1;
+            const highestRankInTierAbove = Math.max(...tierAbove.players.map(player => player[rankField] as number));
+            newRank = highestRankInTierAbove + 1;
           } else if (tierBelow) {
-            const bestRankInTierBelow = Math.min(...tierBelow.players.map(player => player[rankField] as number));
-            newRank = bestRankInTierBelow + 1;
+            const lowestRankInTierBelow = Math.min(...tierBelow.players.map(player => player[rankField] as number));
+            newRank = lowestRankInTierBelow + 1;
           } else {
             newRank = 1;
           }
@@ -210,30 +210,10 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
           : { ...activePlayer, positionalTier: overTierNumber, positionalRank: newRank };
   
         onUpdatePlayer(updatedPlayer);
-        setTiers(tiers => {
-          const updatedTiers = tiers.map(tier => {
-            if (tier.tierNumber === overTierNumber) {
-              return {
-                ...tier,
-                players: tier.players.filter(player => player.id !== activeId).concat(updatedPlayer)
-              };
-            } else if (tier.players.some(player => player.id === activeId)) {
-              return {
-                ...tier,
-                players: tier.players.filter(player => player.id !== activeId)
-              };
-            }
-            return tier;
-          });
-          if (!updatedTiers.some(tier => tier.tierNumber === 0)) {
-            updatedTiers.push({ tierName: "Untiered", tierNumber: 0, players: [] });
-          }
-  
-          return updatedTiers;
-        });
       }
     }
   };
+  
 
 
 
