@@ -83,7 +83,7 @@ function App() {
         pointValue: setting.pointValue,
       }));
 
-      axios.post<Player[]>(BACKEND_URL + '/scoring/update?returnPlayers=true', scoringSettingsPayload)
+      axios.post<Player[]>(`${BACKEND_URL}/scoring/update?returnPlayers=true`, scoringSettingsPayload)
         .then(response => {
           setPlayers(response.data);
           setUpdating(false);

@@ -5,6 +5,7 @@ import { Player } from '../../interfaces/Player';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
 import { Position } from '../../enums/Position.enum';
+import { BACKEND_URL } from '../../util/constants';
 
 interface TiersProps {
   players: Player[];
@@ -17,8 +18,79 @@ interface TiersProps {
 const Tiers: React.FC<TiersProps> = ({ players, adpType, platform, onUpdatePlayer, setPlayers }) => {
   const [isLocked, setIsLocked] = useState(true);
 
-  const toggleLock = () => {
+  const toggleLock = async () => {
     setIsLocked(!isLocked);
+    const overallTierUpdates = players
+      .filter(player => player.overallTier > 0)
+      .map(player => ({
+        playerId: player.id,
+        tierType: Position.OVERALL,
+        tier: player.overallTier
+      }));
+    const positionalTierUpdates = players
+      .filter(player => player.positionalTier > 0)
+      .map(player => ({
+        playerId: player.id,
+        tierType: player.position,
+        tier: player.positionalTier
+      }));
+      const overallRankUpdates = players
+      .filter(player => player.overallTier > 0)
+      .map(player => ({
+        playerId: player.id,
+        rankType: Position.OVERALL,
+        rank: player.overallRank
+      }));
+    const positionalRankUpdates = players
+      .filter(player => player.positionalTier > 0)
+      .map(player => ({
+        playerId: player.id,
+        rankType: player.position,
+        rank: player.positionalRank
+      }));
+
+    try {
+      const updateTiersUrl = `${BACKEND_URL}/players/update-tiers`;
+      const updateRanksUrl = `${BACKEND_URL}/players/update-ranks`
+      if (overallTierUpdates.length > 0) {
+        fetch(updateTiersUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(overallTierUpdates),
+        });
+      }
+      if (positionalTierUpdates.length > 0) {
+        fetch(updateTiersUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(positionalTierUpdates),
+        });
+      }
+        if (overallRankUpdates.length > 0) {
+          fetch(updateRanksUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(overallRankUpdates),
+          });
+        }
+        if (positionalTierUpdates.length > 0) {
+          fetch(updateRanksUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(positionalRankUpdates),
+          });
+        }
+    } catch (error) {
+      console.error('Error updating tiers:', error);
+    }
   };
 
   return (
