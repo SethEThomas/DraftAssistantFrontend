@@ -152,3 +152,16 @@ input:checked + .slider:before {
 .modal-links .icon {
   margin-left: 5px;
 }
+
+.number-of-rounds {
+  display: inline-block;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #23272a;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.5;
+  width: 100px;
+  text-align: center;
+}

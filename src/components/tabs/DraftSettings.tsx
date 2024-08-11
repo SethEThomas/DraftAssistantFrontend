@@ -95,9 +95,17 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
   };
 
   const handleUpdateRosterSettings = (updatedRosterSettings: DraftSettingsInterface['teamSettings']) => {
+    const newNumRounds = updatedRosterSettings.qbSlots +
+                          updatedRosterSettings.rbSlots +
+                          updatedRosterSettings.teSlots +
+                          updatedRosterSettings.wrSlots +
+                          updatedRosterSettings.flexSlots +
+                          updatedRosterSettings.benchSlots;
+    
     setSettings(prevSettings => ({
       ...prevSettings,
       teamSettings: updatedRosterSettings,
+      numRounds: newNumRounds,
     }));
   };
 
@@ -139,16 +147,12 @@ const DraftSettings: React.FC<DraftSettingsProps> = ({ draftSettings, onSave }) 
             ))}
           </select>
         </label>
-        <label>
-          Number of rounds:
-          <input
-            type="number"
-            name="numRounds"
-            value={settings.numRounds}
-            onChange={handleChange}
-            min="1"
-          />
-        </label>
+          <label>
+            Number of rounds:
+            <div className="number-of-rounds">
+              {settings.numRounds}
+            </div>
+          </label>
         <label>
           3rd round reversal:
           <label className="switch">

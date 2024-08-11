@@ -97,7 +97,7 @@ interface RosterSettingsModalProps {
               <input
                 type="number"
                 name="flexSpots"
-                value={settings.flexSpots}
+                value={settings.flexSlots}
                 onChange={handleChange}
                 min="0"
               />

@@ -29,7 +29,7 @@ const initialDraftSettings: DraftSettingsInterface = {
     wrSlots: 2,
     rbSlots: 2,
     teSlots: 1,
-    flexSpots: 2,
+    flexSlots: 2,
     flexOptions: [Position.WR, Position.RB, Position.TE],
     benchSlots: 7,
   },

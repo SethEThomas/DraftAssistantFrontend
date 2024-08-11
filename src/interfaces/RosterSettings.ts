@@ -5,7 +5,7 @@ export interface RosterSettings {
     wrSlots: number;
     rbSlots: number;
     teSlots: number;
-    flexSpots: number;
+    flexSlots: number;
     flexOptions: Position[];
     benchSlots: number;
 }
