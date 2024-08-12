@@ -17,6 +17,8 @@ import { Position } from './enums/Position.enum';
 import { ScoringSettingInterface } from './interfaces/ScoringSettingInterface';
 import { TeamInterface } from './interfaces/TeamInterface';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { formatPickNumber } from './util/PickCalculator';
+import { toCamelCase } from './components/player/PlayerDisplaySmall';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 12,
@@ -43,6 +45,19 @@ function App() {
   const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
   const [updating, setUpdating] = useState(false);
   const [teams, setTeams] = useState<TeamInterface[]>([]);
+
+  const updatePlayersWithFormattedPickNumber = (players: Player[], numTeams: number) => {
+    const updatedPlayers = players.map(player => {
+      const adpField = `${Platform[draftSettings.displayAdpPlatform].toLowerCase()}${toCamelCase(AdpType[draftSettings.displayAdpType])}`;
+      const adpValue = (player.adp as any)[adpField];
+      const pickNumber = Math.floor(adpValue);
+      return {
+        ...player,
+        formattedPickNumber: formatPickNumber(pickNumber, numTeams),
+      };
+    });
+    return updatedPlayers;
+  };
 
   const handleFavoriteToggle = async (playerId: number) => {
     const updatedPlayers = players.map(player =>
@@ -81,7 +96,8 @@ function App() {
   useEffect(() => {
     axios.get<Player[]>(BACKEND_URL + '/players')
       .then(response => {
-        setPlayers(response.data);
+        const playersWithFormattedPickNumber = updatePlayersWithFormattedPickNumber(response.data, draftSettings.numTeams);
+        setPlayers(playersWithFormattedPickNumber);
         setLoading(false);
       })
       .catch(error => {
@@ -118,6 +134,13 @@ function App() {
     });
   }, [draftSettings.numTeams]);
 
+  useEffect(() => {
+    if (players.length > 0) {
+      const updatedPlayers = updatePlayersWithFormattedPickNumber(players, draftSettings.numTeams);
+      setPlayers(updatedPlayers);
+    }
+  }, [draftSettings.displayAdpType, draftSettings.displayAdpPlatform, draftSettings.numTeams]);
+
   const handleUpdatePlayer = (updatedPlayer: Player) => {
     setPlayers((prevPlayers) =>
       prevPlayers.map((player) =>
@@ -147,7 +170,8 @@ function App() {
 
       axios.post<Player[]>(`${BACKEND_URL}/scoring/update?returnPlayers=true`, scoringSettingsPayload)
         .then(response => {
-          setPlayers(response.data);
+          const playersWithFormattedPickNumber = updatePlayersWithFormattedPickNumber(response.data, updatedSettings.numTeams);
+          setPlayers(playersWithFormattedPickNumber);
           setUpdating(false);
         })
         .catch(error => {

@@ -27,7 +27,7 @@ const getColorForPosition = (position: Position): string => {
     return positionColorMapping[position] || 'gray';
 };
 
-const toCamelCase = (str: string) => {
+export const toCamelCase = (str: string) => {
     return str
         .toLowerCase()
         .replace(/_./g, match => match[1].toUpperCase())
@@ -77,7 +77,7 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
                 <div className="player-position">{player.position} {player.teamAbbreviation}</div>
                 <div className="adp-info">
                     <div className="label">{platformLabel} {adpTypeLabel} ADP:</div>
-                    <div className="value">{formatNumber(adpValue)}</div>
+                    <div className="value">{formatNumber(adpValue)} ({player.formattedPickNumber})</div>
                 </div>
             </div>
             <div className="middle-column">

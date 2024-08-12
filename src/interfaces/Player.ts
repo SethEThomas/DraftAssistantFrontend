@@ -24,4 +24,5 @@ export interface Player {
     adp: AggregateAdp;
     stats: AggregateStat;
     totalProjectedPoints: number;
+    formattedPickNumber: string;
   }

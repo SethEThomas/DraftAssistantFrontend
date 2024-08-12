@@ -173,7 +173,7 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
       if (activePlayer) {
         const currentTierIndex = tiers.findIndex(tier => tier.tierNumber === overTierNumber);
         const rankField: keyof Player = position === Position.OVERALL ? 'overallRank' : 'positionalRank';
-  
+        const currentRank = activePlayer[rankField];
         let newRank: number;
   
         if (overTier.players.length > 0) {
@@ -197,10 +197,10 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
   
           if (tierAbove) {
             const highestRankInTierAbove = Math.max(...tierAbove.players.map(player => player[rankField] as number));
-            newRank = highestRankInTierAbove + 1;
+            newRank = currentRank === highestRankInTierAbove ? currentRank : highestRankInTierAbove + 1;
           } else if (tierBelow) {
             const lowestRankInTierBelow = Math.min(...tierBelow.players.map(player => player[rankField] as number));
-            newRank = lowestRankInTierBelow + 1;
+            newRank = currentRank === lowestRankInTierBelow ? currentRank : lowestRankInTierBelow - 1 ;
           } else {
             newRank = 1;
           }
