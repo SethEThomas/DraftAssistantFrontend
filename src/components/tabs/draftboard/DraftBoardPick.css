@@ -1,0 +1,23 @@
+.draft-board-pick {
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #3b3b3b;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  }
+  
+  .draft-board-pick .pick-number {
+    font-size: 12px;
+    color: #fff;
+  }
+  
+  .draft-board-pick .player-info {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+  }
+  

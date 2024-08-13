@@ -25,4 +25,5 @@ export interface Player {
     stats: AggregateStat;
     totalProjectedPoints: number;
     formattedPickNumber: string;
+    isDrafted: boolean;
   }

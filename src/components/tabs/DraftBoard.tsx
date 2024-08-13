@@ -1,24 +1,75 @@
-import React from 'react';
-import { Player } from '../../interfaces/Player';
-import { calculateTeamPick, formatPickNumber } from '../../util/PickCalculator';
+import { DraftSettingsInterface } from "../../interfaces/DraftSettingsInterface";
+import { Player } from "../../interfaces/Player";
+import { TeamInterface } from "../../interfaces/TeamInterface";
+import DraftBoardPick from "./draftboard/DraftBoardPick";
+import './DraftBoard.css';
 
 interface DraftBoardProps {
+    draftSettings: DraftSettingsInterface;
     players: Player[];
-}
-
-const DraftBoard: React.FC<DraftBoardProps> = ({ players }) => {
-    const numbers: number[] = Array.from({ length: 180 }, (_, index) => index + 1);
+    teams: TeamInterface[];
+    setTeams: React.Dispatch<React.SetStateAction<TeamInterface[]>>;
+    setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
+  }
+  
+  const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, setTeams, setPlayers }) => {
+    const generatePickNumber = (round: number, teamId: number, numTeams: number) => {
+        let pickNumber: number;
     
+        if (draftSettings.thirdRoundReversal) {
+            if (round === 1) {
+                pickNumber = (round - 1) * numTeams + teamId;
+            } else if (round === 2) {
+                pickNumber = round * numTeams - teamId + 1;
+            } else if (round === 3) {
+                pickNumber = round * numTeams - teamId + 1;
+            } else if (round % 2 === 0) {
+                pickNumber = (round - 1) * numTeams + teamId;
+            } else {
+                pickNumber = round * numTeams - teamId + 1;
+            }
+        } else {
+            if (round % 2 === 1) {
+                pickNumber = (round - 1) * numTeams + teamId;
+            } else {
+                pickNumber = round * numTeams - teamId + 1;
+            }
+        }
+    
+        return pickNumber;
+    };
+    
+    
+      
+  
     return (
-        <div>
-            <h2>Draftboard</h2>
-            <ul>
-                {numbers.map(number => (
-                    <li key={number}>Pick Number: {number} ({formatPickNumber(number, 12)})  team: {calculateTeamPick(number, 12, true)} </li>
-                ))}
-            </ul>
+      <div className="draft-board">
+        <div className="draft-board-grid">
+          <div className="draft-board-header">
+            {teams.map(team => (
+              <div key={team.teamId} className="draft-board-header-cell">
+                Team {team.teamId}
+              </div>
+            ))}
+          </div>
+          {[...Array(draftSettings.numRounds)].map((_, roundIndex) => (
+            <div key={roundIndex} className="draft-board-row">
+              {[...Array(teams.length)].map((_, teamIndex) => {
+                const pickNumber = generatePickNumber(roundIndex + 1, teamIndex + 1, teams.length);
+                return (
+                  <DraftBoardPick
+                    key={teamIndex}
+                    players={players}
+                    teams={teams}
+                    pickNumber={pickNumber}
+                  />
+                );
+              })}
+            </div>
+          ))}
         </div>
+      </div>
     );
-}
-
-export default DraftBoard;
+  };
+  
+  export default DraftBoard;

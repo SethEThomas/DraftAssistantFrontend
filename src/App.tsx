@@ -203,7 +203,7 @@ function App() {
           <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle}/>
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<DraftBoard players={players} />} />
+              <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} />} />
               <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
               <Route path="/teams" element={<Teams teams={teams} draftSettings={draftSettings} />} />
               <Route 
