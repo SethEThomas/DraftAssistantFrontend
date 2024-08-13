@@ -1,15 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import nerd from '../../assets/images/nerd.jpeg';
 import { Player } from '../../interfaces/Player';
 import PlayerDropdown from '../searchAndFilter/PlayerDropdown';
+import axios from 'axios';
+import { BACKEND_URL } from '../../util/constants';
 
 interface MainNavbarProps {
     players: Player[];
     onUpdatePlayer: (updatedPlayer: Player) => void;
+    setPlayers: (players: Player[]) => void;
 }
 
-const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer }) => {
+const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer, setPlayers }) => {
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const handleRefreshStats = async () => {
+        try {
+            await axios.post(`${BACKEND_URL}/load-player-data?sources=ALL`);
+            console.log('Stats/ADPs refreshed successfully');
+        } catch (error) {
+            console.error('Error refreshing Stats/ADPs:', error);
+        }
+    };
+
+    const handleFixRanks = () => {
+        // Copy the players array to avoid mutating the original array
+        const fixedPlayers = [...players];
+    
+        // Handle overall rank fix
+        // Filter out players with overallRank of 0
+        const playersWithValidOverallRank = fixedPlayers.filter(player => player.overallRank !== 0);
+    
+        // Sort players with valid overallRank and assign new overall ranks
+        playersWithValidOverallRank.sort((a, b) => a.overallRank - b.overallRank);
+        playersWithValidOverallRank.forEach((player, index) => {
+            player.overallRank = index + 1;
+        });
+    
+        // Handle positional rank fix
+        // Filter out players with positionalRank of 0
+        const positions = Array.from(new Set(fixedPlayers.map(player => player.position)));
+        positions.forEach(position => {
+            const positionPlayers = fixedPlayers.filter(player => player.position === position && player.positionalRank !== 0);
+            
+            // Sort players with valid positionalRank and assign new positional ranks
+            positionPlayers.sort((a, b) => a.positionalRank - b.positionalRank);
+            positionPlayers.forEach((player, index) => {
+                player.positionalRank = index + 1;
+            });
+        });
+    
+        // Update the players state with the adjusted ranks
+        setPlayers(fixedPlayers);
+    };
+    
+    
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
@@ -32,6 +79,18 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer }) => {
             </div>
             <div className="navbar-right">
                 <PlayerDropdown players={players} onUpdatePlayer={onUpdatePlayer} />
+                <div className="wrench-container">
+                    <i
+                        className="fas fa-wrench"
+                        onClick={() => setShowDropdown(!showDropdown)}
+                    ></i>
+                    {showDropdown && (
+                        <div className="dropdown-menu">
+                            <button onClick={handleRefreshStats}>Refresh Stats/ADPs</button>
+                            <button onClick={handleFixRanks}>Fix Ranks</button>
+                        </div>
+                    )}
+                </div>
             </div>
         </nav>
     );

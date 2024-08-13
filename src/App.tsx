@@ -198,7 +198,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} />
+        <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} setPlayers={setPlayers} />
         <div className="main-layout">
           <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle}/>
           <main className="main-content">

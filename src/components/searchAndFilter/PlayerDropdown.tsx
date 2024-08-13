@@ -33,7 +33,7 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setSearchQuery(query);
-        setDropdownVisible(query.length > 0); // Show dropdown only if there is text
+        setDropdownVisible(query.length > 0);
     };
 
     const handleBlur = () => {
