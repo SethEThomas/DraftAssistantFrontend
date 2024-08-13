@@ -1,3 +1,4 @@
+import React from "react";
 import { DraftSettingsInterface } from "../../interfaces/DraftSettingsInterface";
 import { Player } from "../../interfaces/Player";
 import { TeamInterface } from "../../interfaces/TeamInterface";
@@ -10,12 +11,12 @@ interface DraftBoardProps {
     teams: TeamInterface[];
     setTeams: React.Dispatch<React.SetStateAction<TeamInterface[]>>;
     setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
-  }
-  
-  const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, setTeams, setPlayers }) => {
+}
+
+const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, setTeams, setPlayers }) => {
     const generatePickNumber = (round: number, teamId: number, numTeams: number) => {
         let pickNumber: number;
-    
+
         if (draftSettings.thirdRoundReversal) {
             if (round === 1) {
                 pickNumber = (round - 1) * numTeams + teamId;
@@ -35,41 +36,42 @@ interface DraftBoardProps {
                 pickNumber = round * numTeams - teamId + 1;
             }
         }
-    
+
         return pickNumber;
     };
-    
-    
-      
-  
+
     return (
-      <div className="draft-board">
-        <div className="draft-board-grid">
-          <div className="draft-board-header">
-            {teams.map(team => (
-              <div key={team.teamId} className="draft-board-header-cell">
-                Team {team.teamId}
-              </div>
-            ))}
-          </div>
-          {[...Array(draftSettings.numRounds)].map((_, roundIndex) => (
-            <div key={roundIndex} className="draft-board-row">
-              {[...Array(teams.length)].map((_, teamIndex) => {
-                const pickNumber = generatePickNumber(roundIndex + 1, teamIndex + 1, teams.length);
-                return (
-                  <DraftBoardPick
-                    key={teamIndex}
-                    players={players}
-                    teams={teams}
-                    pickNumber={pickNumber}
-                  />
-                );
-              })}
+        <div className="draft-board">
+            <div className="draft-board-grid">
+                <div className="draft-board-header">
+                    {teams.map(team => (
+                        <div key={team.teamId} className="draft-board-header-cell">
+                            Team {team.teamId}
+                        </div>
+                    ))}
+                </div>
+                {[...Array(draftSettings.numRounds)].map((_, roundIndex) => (
+                    <div key={roundIndex} className="draft-board-row">
+                        {[...Array(teams.length)].map((_, teamIndex) => {
+                            const teamId = teamIndex + 1;
+                            const pickNumber = generatePickNumber(roundIndex + 1, teamId, teams.length);
+                            return (
+                                <DraftBoardPick
+                                    key={teamIndex}
+                                    players={players}
+                                    teams={teams}
+                                    pickNumber={pickNumber}
+                                    teamId={teamId}
+                                    setTeams={setTeams}
+                                    setPlayers={setPlayers}
+                                />
+                            );
+                        })}
+                    </div>
+                ))}
             </div>
-          ))}
         </div>
-      </div>
     );
-  };
-  
-  export default DraftBoard;
+};
+
+export default DraftBoard;

@@ -37,7 +37,6 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
     };
 
     const handleBlur = () => {
-        // Timeout to ensure dropdown click event is processed before hiding
         setTimeout(() => {
             setSearchQuery('');
             setDropdownVisible(false);
@@ -45,7 +44,7 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({ players, onUpdatePlayer
     };
 
     const handleDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation(); // Prevent the dropdown from closing when clicking inside it
+        e.stopPropagation();
     };
 
     const handleEditPlayer = (player: Player) => {
