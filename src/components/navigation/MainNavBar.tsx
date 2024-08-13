@@ -25,33 +25,20 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer, setPla
     };
 
     const handleFixRanks = () => {
-        // Copy the players array to avoid mutating the original array
         const fixedPlayers = [...players];
-    
-        // Handle overall rank fix
-        // Filter out players with overallRank of 0
         const playersWithValidOverallRank = fixedPlayers.filter(player => player.overallRank !== 0);
-    
-        // Sort players with valid overallRank and assign new overall ranks
         playersWithValidOverallRank.sort((a, b) => a.overallRank - b.overallRank);
         playersWithValidOverallRank.forEach((player, index) => {
             player.overallRank = index + 1;
         });
-    
-        // Handle positional rank fix
-        // Filter out players with positionalRank of 0
         const positions = Array.from(new Set(fixedPlayers.map(player => player.position)));
         positions.forEach(position => {
             const positionPlayers = fixedPlayers.filter(player => player.position === position && player.positionalRank !== 0);
-            
-            // Sort players with valid positionalRank and assign new positional ranks
             positionPlayers.sort((a, b) => a.positionalRank - b.positionalRank);
             positionPlayers.forEach((player, index) => {
                 player.positionalRank = index + 1;
             });
         });
-    
-        // Update the players state with the adjusted ranks
         setPlayers(fixedPlayers);
     };
     
