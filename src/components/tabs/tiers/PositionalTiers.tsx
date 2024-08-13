@@ -173,12 +173,14 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
       if (activePlayer) {
         const currentTierIndex = tiers.findIndex(tier => tier.tierNumber === overTierNumber);
         const rankField: keyof Player = position === Position.OVERALL ? 'overallRank' : 'positionalRank';
+        const tierField: keyof Player = position === Position.OVERALL ? 'overallTier' : 'positionalTier';
         const currentRank = activePlayer[rankField];
+        const currentTier = activePlayer[tierField];
         let newRank: number;
-  
-        if (overTier.players.length > 0) {
+        if(overTier.tierNumber === 1 && overTier.players.length == 0) newRank = 1;
+        else if (overTier.players.length > 0) {
           const highestRankInOverTier = Math.max(...overTier.players.map(player => player[rankField] as number));
-          newRank = highestRankInOverTier + 1;
+          newRank = overTier.tierNumber == currentTier ? highestRankInOverTier + 2 : highestRankInOverTier + 1;
         } else {
           let tierAbove = null;
           for (let i = currentTierIndex - 1; i >= 0; i--) {
@@ -197,10 +199,10 @@ const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, ad
   
           if (tierAbove) {
             const highestRankInTierAbove = Math.max(...tierAbove.players.map(player => player[rankField] as number));
-            newRank = currentRank === highestRankInTierAbove ? currentRank : highestRankInTierAbove + 1;
+            newRank = tierAbove.tierNumber == currentTier ?  highestRankInTierAbove : highestRankInTierAbove + 1;
           } else if (tierBelow) {
             const lowestRankInTierBelow = Math.min(...tierBelow.players.map(player => player[rankField] as number));
-            newRank = currentRank === lowestRankInTierBelow ? currentRank : lowestRankInTierBelow - 1 ;
+            newRank = tierBelow.tierNumber == currentTier ? lowestRankInTierBelow : lowestRankInTierBelow - 1;
           } else {
             newRank = 1;
           }
