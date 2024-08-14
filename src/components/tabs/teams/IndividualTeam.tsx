@@ -1,3 +1,4 @@
+import React from "react";
 import { Position } from "../../../enums/Position.enum";
 import { DraftSettingsInterface } from "../../../interfaces/DraftSettingsInterface";
 import { Player } from "../../../interfaces/Player";
@@ -12,22 +13,85 @@ interface IndividualTeamProps {
 }
 
 const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) => {
-  const { qbSlots, wrSlots, rbSlots, teSlots, flexSlots, benchSlots } = draftSettings.teamSettings;
-  const positions = {
+  const { qbSlots, wrSlots, rbSlots, teSlots, flexSlots, benchSlots, flexOptions } = draftSettings.teamSettings;
+
+  const positionSlots: Record<Position, number> = {
     [Position.QB]: qbSlots,
     [Position.WR]: wrSlots,
     [Position.RB]: rbSlots,
     [Position.TE]: teSlots,
     [Position.FLEX]: flexSlots,
+    [Position.OVERALL]: 0,
+    [Position.UNKNOWN]: 0,
+    [Position.BENCH]: benchSlots,
   };
 
-  const sortedPlayers = [...team.players].sort((a, b) => (b.totalProjectedPoints ?? 0) - (a.totalProjectedPoints ?? 0));
+  const sortedPlayers = [...team.players].sort((a, b) => {
+    return (b.stats.totalProjectedPoints ?? 0) - (a.stats.totalProjectedPoints ?? 0);
+  });
+
+  const assignedPlayers: Partial<Record<Position, Player[]>> = {
+    [Position.QB]: [],
+    [Position.WR]: [],
+    [Position.RB]: [],
+    [Position.TE]: [],
+    [Position.FLEX]: [],
+    [Position.BENCH]: [],
+  };
+
+  const recalculateAssignments = () => {
+    for (const player of sortedPlayers) {
+      assignPlayerToSlot(player, player.position);
+    }
+    const remainingPlayers = sortedPlayers.filter(
+      (player) => !Object.values(assignedPlayers).flat().includes(player)
+    );
+    for (const player of remainingPlayers) {
+      if (flexOptions.includes(player.position)) {
+        assignPlayerToSlot(player, Position.FLEX);
+      }
+    }
+    const remainingForBench = sortedPlayers.filter(
+      (player) => !Object.values(assignedPlayers).flat().includes(player)
+    );
+    for (const player of remainingForBench) {
+      assignPlayerToSlot(player, Position.BENCH);
+    }
+  };
+
+  const assignPlayerToSlot = (player: Player, slot: Position) => {
+    if (slot !== Position.OVERALL && slot !== Position.UNKNOWN) {
+      if (assignedPlayers[slot]?.length! < positionSlots[slot]) {
+        assignedPlayers[slot]?.push(player);
+        return true;
+      } else {
+        const minProjectedPlayer = assignedPlayers[slot]?.reduce((min, p) =>
+          p.stats.totalProjectedPoints! < min.stats.totalProjectedPoints! ? p : min
+        );
+        if (minProjectedPlayer && player.stats.totalProjectedPoints! > minProjectedPlayer.stats.totalProjectedPoints!) {
+          assignedPlayers[slot] = assignedPlayers[slot]?.filter((p) => p !== minProjectedPlayer);
+          assignedPlayers[slot]?.push(player);
+          if (!assignPlayerToSlot(minProjectedPlayer, Position.FLEX)) {
+            assignPlayerToSlot(minProjectedPlayer, Position.BENCH);
+          }
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  recalculateAssignments();
 
   const getPlayerComponents = (position: Position, count: number) => {
-    const playersForPosition = sortedPlayers.filter(player => player.position === position);
+    if (position === Position.OVERALL || position === Position.UNKNOWN) {
+      return null;
+    }
+
+    const playersForPosition = assignedPlayers[position] || [];
     const emptySlots = count - playersForPosition.length;
 
-    const playerComponents = playersForPosition.map(player => (
+    const playerComponents = playersForPosition.map((player) => (
       <DraftedPlayer key={player.id} player={player} position={position} />
     ));
 
@@ -38,59 +102,32 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
     return [...playerComponents, ...emptySlotComponents];
   };
 
-  const getFlexAndBenchPlayers = () => {
-    const flexOptions = draftSettings.teamSettings.flexOptions.map(opt => opt.toString());
-    const occupiedPositions = new Set(team.players.map(player => player.position));
-
-    const flexPlayers = sortedPlayers.filter(player => 
-      flexOptions.includes(player.position) &&
-      !occupiedPositions.has(player.position)
-    );
-
-    const benchPlayers = sortedPlayers.filter(player => 
-      !Object.keys(positions).includes(player.position) &&
-      !occupiedPositions.has(player.position)
-    );
-
-    const flexSlotsAvailable = flexSlots - flexPlayers.length;
-    const benchSlotsAvailable = benchSlots - benchPlayers.length;
-
-    return {
-      flexPlayers: flexPlayers.slice(0, flexSlotsAvailable),
-      benchPlayers: benchPlayers.slice(0, benchSlotsAvailable),
-      emptyFlexSlots: Array.from({ length: flexSlotsAvailable }).map((_, index) => (
-        <DraftedPlayer key={`flex-empty-${index}`} position={Position.FLEX} />
-      )),
-      emptyBenchSlots: Array.from({ length: benchSlotsAvailable }).map((_, index) => (
-        <DraftedPlayer key={`bench-empty-${index}`} position={Position.BENCH} />
-      )),
-    };
-  };
-
-  const flexAndBench = getFlexAndBenchPlayers();
-
-  const totalProjectedPoints = (players: Player[]) =>
-    players
-      .filter(player => player.position !== Position.BENCH)
-      .reduce((acc, player) => acc + (player.totalProjectedPoints ?? 0), 0);
-
   const calculateNeeds = () => {
     const needs = [];
 
-    const qbNeeds = qbSlots - sortedPlayers.filter(player => player.position === Position.QB).length;
-    const wrNeeds = wrSlots - sortedPlayers.filter(player => player.position === Position.WR).length;
-    const rbNeeds = rbSlots - sortedPlayers.filter(player => player.position === Position.RB).length;
-    const teNeeds = teSlots - sortedPlayers.filter(player => player.position === Position.TE).length;
-    const flexNeeds = flexSlots - flexAndBench.flexPlayers.length;
+    const qbNeeds = qbSlots - (assignedPlayers[Position.QB]?.length || 0);
+    const wrNeeds = wrSlots - (assignedPlayers[Position.WR]?.length || 0);
+    const rbNeeds = rbSlots - (assignedPlayers[Position.RB]?.length || 0);
+    const teNeeds = teSlots - (assignedPlayers[Position.TE]?.length || 0);
+    const flexNeeds = flexSlots - (assignedPlayers[Position.FLEX]?.length || 0);
 
-    if (qbNeeds > 0) needs.push(`${qbNeeds}QB`);
-    if (wrNeeds > 0) needs.push(`${wrNeeds}WR`);
-    if (rbNeeds > 0) needs.push(`${rbNeeds}RB`);
-    if (teNeeds > 0) needs.push(`${teNeeds}TE`);
-    if (flexNeeds > 0) needs.push(`${flexNeeds}FLEX`);
+    if (qbNeeds > 0) needs.push(`${qbNeeds} QB`);
+    if (wrNeeds > 0) needs.push(`${wrNeeds} WR`);
+    if (rbNeeds > 0) needs.push(`${rbNeeds} RB`);
+    if (teNeeds > 0) needs.push(`${teNeeds} TE`);
+    if (flexNeeds > 0) needs.push(`${flexNeeds} FLEX`);
 
     return needs.length > 0 ? `NEEDS: ${needs.join(", ")}` : "FULL";
   };
+
+  const totalProjectedPoints = (assignedPlayers: Partial<Record<Position, Player[]>>) =>
+    Object.keys(assignedPlayers).reduce((acc, position) => {
+      if (position !== Position.BENCH) {
+        acc += (assignedPlayers[position as Position]?.reduce((sum, player) => sum + (player.stats.totalProjectedPoints ?? 0), 0)) || 0;
+      }
+      return acc;
+    }, 0);
+
   const borderClass = team.teamId === draftSettings.myTeam ? "gold-border" : "";
 
   return (
@@ -102,17 +139,11 @@ const IndividualTeam: React.FC<IndividualTeamProps> = ({ team, draftSettings }) 
         {getPlayerComponents(Position.WR, wrSlots)}
         {getPlayerComponents(Position.RB, rbSlots)}
         {getPlayerComponents(Position.TE, teSlots)}
-        {flexAndBench.flexPlayers.map(player => (
-          <DraftedPlayer key={player.id} player={player} position={Position.FLEX} />
-        ))}
-        {flexAndBench.emptyFlexSlots}
-        {flexAndBench.benchPlayers.map(player => (
-          <DraftedPlayer key={player.id} player={player} position={Position.BENCH} />
-        ))}
-        {flexAndBench.emptyBenchSlots}
+        {getPlayerComponents(Position.FLEX, flexSlots)}
+        {getPlayerComponents(Position.BENCH, benchSlots)}
       </div>
       <div className="team-needs">
-        <p>Season projection: {formatNumber(totalProjectedPoints(team.players))}</p>
+        <p>Season projection: {formatNumber(totalProjectedPoints(assignedPlayers))}</p>
       </div>
     </div>
   );
