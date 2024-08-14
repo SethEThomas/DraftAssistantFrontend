@@ -19,14 +19,15 @@ interface SidebarProps {
 const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platform, hideDrafted, onFavoriteToggle }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosition, setSelectedPosition] = useState('All');
-    const [isCollapsed, setIsCollapsed] = useState(false); // State for collapse
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const filteredPlayers = players.filter(player => {
         const normalizedName = player.normalizedName.replace(/\s+/g, '').toLowerCase();
         const searchNormalized = searchQuery.replace(/\s+/g, '').toLowerCase();
         const matchesSearch = normalizedName.includes(searchNormalized);
         const matchesPosition = selectedPosition === 'All' || player.position === selectedPosition;
-        return matchesSearch && matchesPosition;
+        const matchesDraftStatus = !hideDrafted || !player.isDrafted;
+        return matchesSearch && matchesPosition && matchesDraftStatus;
     });
 
     return (
@@ -56,7 +57,7 @@ const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platfo
                             />
                         </>
                     )}
-                    <div>
+                    <div className={`player-list ${filteredPlayers.length === 0 ? 'empty' : ''}`}>
                         <ul>
                             {filteredPlayers.map(player => (
                                 <li key={player.id}>

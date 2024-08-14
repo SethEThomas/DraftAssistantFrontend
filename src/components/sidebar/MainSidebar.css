@@ -9,6 +9,8 @@
     overflow-y: auto;
     position: relative;
     transition: width 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar.collapsed {
@@ -31,11 +33,6 @@
 
 .sidebar .toggle-btn:hover {
     background-color: #555;
-}
-
-.sidebar.collapsed .search-input,
-.sidebar.collapsed .position-filter {
-    display: none;
 }
 
 .sidebar .loading-container {
@@ -71,4 +68,18 @@
     50% {
         opacity: 1;
     }
+}
+
+.player-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.player-list.empty {
+    display: none;
+}
+
+.sidebar.collapsed .search-input,
+.sidebar.collapsed .position-filter {
+    display: none;
 }
