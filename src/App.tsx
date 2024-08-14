@@ -45,6 +45,7 @@ function App() {
   const [draftSettings, setDraftSettings] = useState<DraftSettingsInterface>(initialDraftSettings);
   const [updating, setUpdating] = useState(false);
   const [teams, setTeams] = useState<TeamInterface[]>([]);
+  const [draftPickSelections, setDraftPickSelections] = useState<Map<number, Player>>(new Map());
 
   const updatePlayersWithFormattedPickNumber = (players: Player[], numTeams: number) => {
     const updatedPlayers = players.map(player => {
@@ -90,8 +91,7 @@ function App() {
     } catch (error) {
         console.error('Error updating favorite status:', error);
     }
-};
-
+  };
 
   useEffect(() => {
     axios.get<Player[]>(BACKEND_URL + '/players')
@@ -203,7 +203,7 @@ function App() {
           <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle}/>
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} />} />
+              <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} draftPickSelections={draftPickSelections} setDraftPickSelections={setDraftPickSelections} />} />
               <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
               <Route path="/teams" element={<Teams teams={teams} draftSettings={draftSettings} />} />
               <Route 

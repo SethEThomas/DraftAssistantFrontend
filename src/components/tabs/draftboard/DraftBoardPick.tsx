@@ -12,17 +12,19 @@ interface DraftBoardPickProps {
     teams: TeamInterface[];
     pickNumber: number;
     teamId: number;
+    draftPickSelections: Map<number, Player>;
     setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
     setTeams: React.Dispatch<React.SetStateAction<TeamInterface[]>>;
+    setDraftPickSelections: React.Dispatch<React.SetStateAction<Map<number, Player>>>;
 }
 
-const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, teams, teamId, setPlayers, setTeams }) => {
+const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, teams, teamId, draftPickSelections, setPlayers, setTeams, setDraftPickSelections}) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
-    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(draftPickSelections.get(pickNumber) || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
+    
     const getBackgroundColor = (position: Position) => {
         switch (position) {
             case Position.QB:
@@ -54,7 +56,9 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
 
     const handlePlayerSelect = (player: Player) => {
         setSelectedPlayer(player);
-
+        const updatedDraftPickSelections = new Map(draftPickSelections);
+        updatedDraftPickSelections.set(pickNumber, player);
+        setDraftPickSelections(updatedDraftPickSelections);
         const updatedTeams = teams.map(team => {
             if (team.teamId === teamId) {
                 return {
@@ -64,16 +68,19 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
             }
             return team;
         });
-
-        setTeams(updatedTeams);
-
+    
         const updatedPlayers = players.map(p => p.id === player.id ? { ...p, isDrafted: true } : p);
+        setTeams(updatedTeams);
         setPlayers(updatedPlayers);
         setShowDropdown(false);
     };
+    
 
     const handleRemovePlayer = () => {
         if (selectedPlayer) {
+            const updatedDraftPickSelections = new Map(draftPickSelections);
+            updatedDraftPickSelections.delete(pickNumber);
+            setDraftPickSelections(updatedDraftPickSelections);
             const updatedTeams = teams.map(team => {
                 if (team.teamId === teamId) {
                     return {
@@ -83,14 +90,14 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
                 }
                 return team;
             });
-
+    
             const updatedPlayers = players.map(p => p.id === selectedPlayer.id ? { ...p, isDrafted: false } : p);
-
             setTeams(updatedTeams);
             setPlayers(updatedPlayers);
             setSelectedPlayer(null);
         }
     };
+    
 
     const handleClickOutside = (e: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {

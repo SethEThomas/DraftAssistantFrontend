@@ -9,11 +9,13 @@ interface DraftBoardProps {
     draftSettings: DraftSettingsInterface;
     players: Player[];
     teams: TeamInterface[];
+    draftPickSelections: Map<number, Player>;
     setTeams: React.Dispatch<React.SetStateAction<TeamInterface[]>>;
     setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
+    setDraftPickSelections: React.Dispatch<React.SetStateAction<Map<number, Player>>>;
 }
 
-const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, setTeams, setPlayers }) => {
+const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, draftPickSelections, setTeams, setPlayers, setDraftPickSelections }) => {
     const generatePickNumber = (round: number, teamId: number, numTeams: number) => {
         let pickNumber: number;
 
@@ -62,8 +64,10 @@ const DraftBoard: React.FC<DraftBoardProps> = ({ draftSettings, players, teams, 
                                     teams={teams}
                                     pickNumber={pickNumber}
                                     teamId={teamId}
+                                    draftPickSelections={draftPickSelections}
                                     setTeams={setTeams}
                                     setPlayers={setPlayers}
+                                    setDraftPickSelections={setDraftPickSelections}
                                 />
                             );
                         })}
