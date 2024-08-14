@@ -10,7 +10,6 @@ interface SearchInputProps {
 const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = "Enter a player name to search" }) => {
     return (
         <div className="search-container">
-            <div className="search-icon">🔍</div>
             <input
                 type="text"
                 className="search-input"

@@ -35,6 +35,31 @@
     background-color: #555;
 }
 
+.tabs-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 0.5rem;
+}
+
+.tab-btn {
+    background-color: #444;
+    color: #8cb6f5;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background-color: #666;
+    font-weight: bold;
+}
+
+.tab-btn:hover {
+    background-color: #555;
+}
+
 .sidebar .loading-container {
     position: absolute;
     top: 50%;
@@ -82,4 +107,13 @@
 .sidebar.collapsed .search-input,
 .sidebar.collapsed .position-filter {
     display: none;
+}
+
+.tab-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #8cb6f5;
 }
