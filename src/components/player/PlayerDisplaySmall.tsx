@@ -13,6 +13,7 @@ interface PlayerDisplaySmallProps {
     player: Player;
     adpType: AdpType;
     platform: Platform;
+    hideDrafted: boolean;
     onFavoriteToggle: (playerId: number) => void;
 }
 
@@ -35,7 +36,7 @@ export const toCamelCase = (str: string) => {
         .replace("_","");
 };
 
-const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform, onFavoriteToggle }) => {
+const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType, platform, hideDrafted, onFavoriteToggle }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id: `player-${player.id}`});
     const [isFavorite, setIsFavorite] = useState(player.isSleeper);
     const backgroundColor = positionColorMapping[player.position];
@@ -43,6 +44,9 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
     const adpValue = (player.adp as any)[adpField];
     const platformLabel = Platform[platform].replace(/_/g, ' ');
     const adpTypeLabel = AdpType[adpType].replace(/_/g, ' ');
+    if (player.isDrafted && hideDrafted) {
+        return null;
+    }
 
     const transitionStyle = {
         transition,

@@ -1,0 +1,43 @@
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+.toggle-switch {
+    width: 60px;
+    height: 34px;
+    background-color: gray;
+    border-radius: 17px;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.toggle-switch.active {
+    background-color: lightblue;
+}
+
+.toggle-thumb {
+    width: 26px;
+    height: 26px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    transition: transform 0.3s;
+}
+
+.toggle-thumb.active {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    margin-left: 10px;
+}

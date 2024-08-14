@@ -12,10 +12,11 @@ interface IndividualTierProps {
     adpType: AdpType;
     platform: Platform;
     position: Position;
+    hideDrafted: boolean;
     onFavoriteToggle: (playerId: number) => void;
 }
 
-const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform, position, onFavoriteToggle }) => {
+const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform, position, hideDrafted, onFavoriteToggle }) => {
     const isThrottled = useRef(false);
     const unlockTimeout = useRef<NodeJS.Timeout | null>(null);
     const isEmpty = tier.players.length === 0;
@@ -80,6 +81,7 @@ const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform
                                 adpType={adpType}
                                 platform={platform}
                                 onFavoriteToggle={onFavoriteToggle}
+                                hideDrafted={hideDrafted}
                             />
                         </li>
                     ))}

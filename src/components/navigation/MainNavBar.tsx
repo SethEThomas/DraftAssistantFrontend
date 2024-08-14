@@ -5,14 +5,17 @@ import { Player } from '../../interfaces/Player';
 import PlayerDropdown from '../searchAndFilter/PlayerDropdown';
 import axios from 'axios';
 import { BACKEND_URL } from '../../util/constants';
+import './MainNavBar.css';
 
 interface MainNavbarProps {
     players: Player[];
     onUpdatePlayer: (updatedPlayer: Player) => void;
     setPlayers: (players: Player[]) => void;
+    hideDrafted: boolean;
+    setHideDrafted: (hide: boolean) => void;
 }
 
-const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer, setPlayers }) => {
+const MainNavbar: React.FC<MainNavbarProps> = ({ players, hideDrafted, onUpdatePlayer, setPlayers, setHideDrafted }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const handleRefreshStats = async () => {
@@ -23,6 +26,11 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer, setPla
             console.error('Error refreshing Stats/ADPs:', error);
         }
     };
+
+    const handleToggleHideDrafted = () => {
+        setHideDrafted(!hideDrafted);
+    };
+
 
     const handleFixRanks = () => {
         const fixedPlayers = [...players];
@@ -49,6 +57,12 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ players, onUpdatePlayer, setPla
             <div className="navbar-left">
                 <img src={nerd} alt="Logo" className="logo" />
                 <h2 className="navbar-left-text">Draft Assistant</h2>
+                <div className="toggle-container" onClick={handleToggleHideDrafted}>
+                    <div className={`toggle-switch ${hideDrafted ? 'active' : ''}`}>
+                        <div className={`toggle-thumb ${hideDrafted ? 'active' : ''}`}></div>
+                    </div>
+                    <span className="toggle-label">{hideDrafted ? 'Hiding drafted players' : 'Showing drafted players'}</span>
+                </div>
             </div>
             <div className="navbar-center">
                 <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>

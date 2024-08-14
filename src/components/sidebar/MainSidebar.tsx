@@ -12,10 +12,11 @@ interface SidebarProps {
     loading: boolean;
     adpType: AdpType;
     platform: Platform;
+    hideDrafted: boolean;
     onFavoriteToggle: (playerId: number) => void;
 }
 
-const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platform, onFavoriteToggle }) => {
+const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platform, hideDrafted, onFavoriteToggle }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosition, setSelectedPosition] = useState('All');
     const [isCollapsed, setIsCollapsed] = useState(false); // State for collapse
@@ -64,6 +65,7 @@ const MainSidebar: React.FC<SidebarProps> = ({ players, loading, adpType, platfo
                                         adpType={adpType}
                                         platform={platform}
                                         onFavoriteToggle={onFavoriteToggle}
+                                        hideDrafted={hideDrafted}
                                     />
                                 </li>
                             ))}

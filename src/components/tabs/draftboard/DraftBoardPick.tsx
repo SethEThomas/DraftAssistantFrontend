@@ -13,12 +13,13 @@ interface DraftBoardPickProps {
     pickNumber: number;
     teamId: number;
     draftPickSelections: Map<number, Player>;
+    hideDrafted: boolean;
     setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
     setTeams: React.Dispatch<React.SetStateAction<TeamInterface[]>>;
     setDraftPickSelections: React.Dispatch<React.SetStateAction<Map<number, Player>>>;
 }
 
-const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, teams, teamId, draftPickSelections, setPlayers, setTeams, setDraftPickSelections}) => {
+const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, teams, teamId, draftPickSelections, hideDrafted, setPlayers, setTeams, setDraftPickSelections}) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
@@ -50,7 +51,11 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
         if (text.trim() === '') {
             setFilteredPlayers([]);
         } else {
-            setFilteredPlayers(players.filter(p => p.normalizedName.toLowerCase().includes(text.toLowerCase())));
+            setFilteredPlayers(players
+                .filter(p => 
+                    p.normalizedName.toLowerCase().includes(text.toLowerCase()) &&
+                    (!hideDrafted || !p.isDrafted)
+                ));
         }
     };
 

@@ -46,6 +46,7 @@ function App() {
   const [updating, setUpdating] = useState(false);
   const [teams, setTeams] = useState<TeamInterface[]>([]);
   const [draftPickSelections, setDraftPickSelections] = useState<Map<number, Player>>(new Map());
+  const [hideDrafted, setHideDrafted] = useState<boolean>(true);
 
   const updatePlayersWithFormattedPickNumber = (players: Player[], numTeams: number) => {
     const updatedPlayers = players.map(player => {
@@ -198,12 +199,12 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} setPlayers={setPlayers} />
+        <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} setPlayers={setPlayers} hideDrafted={hideDrafted} setHideDrafted={setHideDrafted} />
         <div className="main-layout">
-          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle}/>
+          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle} hideDrafted={hideDrafted}/>
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} draftPickSelections={draftPickSelections} setDraftPickSelections={setDraftPickSelections} />} />
+              <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} draftPickSelections={draftPickSelections} setDraftPickSelections={setDraftPickSelections} hideDrafted={hideDrafted}/>} />
               <Route path="/draft-settings" element={<DraftSettings draftSettings={draftSettings} onSave={handleUpdateDraftSettings} />} />
               <Route path="/teams" element={<Teams teams={teams} draftSettings={draftSettings} />} />
               <Route 
@@ -215,6 +216,7 @@ function App() {
                     platform={draftSettings.displayAdpPlatform}
                     onUpdatePlayer={handleUpdatePlayer}
                     setPlayers={setPlayers}
+                    hideDrafted={hideDrafted}
                     onFavoriteToggle={handleFavoriteToggle}
                   />
                 } 

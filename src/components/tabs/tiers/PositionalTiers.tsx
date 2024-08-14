@@ -18,6 +18,7 @@ interface PositionalTiersProps {
   adpType: AdpType;
   platform: Platform;
   isLocked: boolean;
+  hideDrafted: boolean;
   onUpdatePlayer: (player: Player) => void;
   setPlayers: (players: Player[]) => void;
   onFavoriteToggle: (playerId: number) => void;
@@ -71,7 +72,7 @@ const getDraggableIdAndType = (id: string): { type: DroppableType, id: number } 
   return { type, id: calculatedId };
 };
 
-const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, onUpdatePlayer, setPlayers, onFavoriteToggle }) => {
+const PositionalTiers: React.FC<PositionalTiersProps> = ({ players, position, adpType, platform, isLocked, hideDrafted, onUpdatePlayer, setPlayers, onFavoriteToggle }) => {
   const DraggableItem = ({ fullId }: { fullId: string }) => {
     const {type, id} = getDraggableIdAndType(fullId);
     const player = players.find(p => p.id === id);
@@ -311,6 +312,7 @@ const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
                 adpType={adpType} 
                 platform={platform}
                 position={position}
+                hideDrafted={hideDrafted}
                 onFavoriteToggle={onFavoriteToggle}
               />
             ))
@@ -329,6 +331,7 @@ const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
                     adpType={adpType} 
                     platform={platform}
                     position={position}
+                    hideDrafted={hideDrafted}
                     onFavoriteToggle={onFavoriteToggle}
                   />
                 ))}
@@ -353,6 +356,7 @@ const movePlayerDown = (activePlayer: Player, overPlayer: Player): void => {
                     adpType={adpType} 
                     platform={platform}
                     position={position}
+                    hideDrafted={hideDrafted}
                     onFavoriteToggle={onFavoriteToggle}
                   />
                 ))}
