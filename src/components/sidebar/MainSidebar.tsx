@@ -6,12 +6,14 @@ import './MainSidebar.css';
 import PlayerSearchTab from './PlayerSearchTab';
 import PredictionsTab from './PredictionsTab';
 import SuggestionsTab from './SuggestionsTab';
+import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
+import { TeamInterface } from '../../interfaces/TeamInterface';
 
 interface SidebarProps {
     players: Player[];
     loading: boolean;
-    adpType: AdpType;
-    platform: Platform;
+    draftSettings: DraftSettingsInterface;
+    teams: TeamInterface[];
     hideDrafted: boolean;
     onFavoriteToggle: (playerId: number) => void;
 }
@@ -24,7 +26,7 @@ const MainSidebar: React.FC<SidebarProps> = (props) => {
             case 'PlayerSearch':
                 return <PlayerSearchTab {...props} />;
             case 'Predictions':
-                return <PredictionsTab />;
+                return <PredictionsTab players={props.players} teams={props.teams} draftSettings={props.draftSettings}/>;
             case 'Suggestions':
                 return <SuggestionsTab />;
             default:

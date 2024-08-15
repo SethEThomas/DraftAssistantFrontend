@@ -201,7 +201,7 @@ function App() {
       <div className="app">
         <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} setPlayers={setPlayers} hideDrafted={hideDrafted} setHideDrafted={setHideDrafted} />
         <div className="main-layout">
-          <MainSidebar players={players} loading={loading} adpType={draftSettings.displayAdpType} platform={draftSettings.displayAdpPlatform} onFavoriteToggle={handleFavoriteToggle} hideDrafted={hideDrafted}/>
+          <MainSidebar players={players} loading={loading} teams={teams} draftSettings={draftSettings} onFavoriteToggle={handleFavoriteToggle} hideDrafted={hideDrafted}/>
           <main className="main-content">
             <Routes>
               <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} draftPickSelections={draftPickSelections} setDraftPickSelections={setDraftPickSelections} hideDrafted={hideDrafted}/>} />

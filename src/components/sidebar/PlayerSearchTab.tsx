@@ -1,25 +1,24 @@
 import { useState } from 'react';
-import { AdpType } from '../../enums/AdpType.enum';
-import { Platform } from '../../enums/Platform.enum';
 import { Player } from '../../interfaces/Player';
 import PlayerDisplaySmall from '../player/PlayerDisplaySmall';
 import PositionFilter from '../searchAndFilter/PositionFilter';
 import SearchInput from '../searchAndFilter/SearchInput';
 import './MainSidebar.css';
+import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
 
 interface PlayerSearchTabProps {
     players: Player[];
     loading: boolean;
-    adpType: AdpType;
-    platform: Platform;
+    draftSettings: DraftSettingsInterface;
     hideDrafted: boolean;
     onFavoriteToggle: (playerId: number) => void;
 }
 
-const PlayerSearchTab: React.FC<PlayerSearchTabProps> = ({ players, loading, adpType, platform, hideDrafted, onFavoriteToggle }) => {
+const PlayerSearchTab: React.FC<PlayerSearchTabProps> = ({ players, loading, hideDrafted, draftSettings, onFavoriteToggle }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosition, setSelectedPosition] = useState('All');
-
+    const adpType = draftSettings.displayAdpType;
+    const platform = draftSettings.displayAdpPlatform;
     const filteredPlayers = players.filter(player => {
         const normalizedName = player.normalizedName.replace(/\s+/g, '').toLowerCase();
         const searchNormalized = searchQuery.replace(/\s+/g, '').toLowerCase();
