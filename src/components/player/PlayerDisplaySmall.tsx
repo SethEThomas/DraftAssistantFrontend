@@ -21,11 +21,17 @@ const positionColorMapping: Partial<Record<Position, string>> = {
     [Position.QB]: 'darkred',
     [Position.WR]: 'darkblue',
     [Position.RB]: 'darkgreen',
-    [Position.TE]: 'darkorange',
+    [Position.TE]: '#fa690f',
 };
 
 const getColorForPosition = (position: Position): string => {
     return positionColorMapping[position] || 'gray';
+};
+
+const getTextColor = (value: number): string => {
+    if (value > 2) return '#8cfaa2';
+    if (value < -2) return '#f7adad';
+    return 'white'; 
 };
 
 export const toCamelCase = (str: string) => {
@@ -81,7 +87,11 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
                 <div className="player-position">{player.position} {player.teamAbbreviation}</div>
                 <div className="adp-info">
                     <div className="label">{platformLabel} {adpTypeLabel} ADP:</div>
-                    <div className="value">{formatNumber(adpValue)} ({player.formattedPickNumber})</div>
+                    <div className="value">{formatNumber(adpValue)} ({player.formattedPickNumber}) 
+                        <span style={{ padding: 5, fontWeight: 'bold', color: getTextColor(adpValue - player.overallRank) }}>
+                            {formatNumber(adpValue - player.overallRank)}
+                        </span>
+                    </div>
                 </div>
             </div>
             <div className="middle-column">

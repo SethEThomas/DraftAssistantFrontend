@@ -35,7 +35,7 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
             case Position.WR:
                 return 'darkblue';
             case Position.TE:
-                return 'darkorange';
+                return '#fa690f';
             default:
                 return '#3b3b3b';
         }

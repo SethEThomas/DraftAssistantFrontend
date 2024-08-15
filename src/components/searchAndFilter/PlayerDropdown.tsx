@@ -11,7 +11,7 @@ interface PlayerDropdownProps {
 const positionColors: { [key: string]: string } = {
     QB: 'darkred',
     WR: 'darkblue',
-    TE: 'darkorange',
+    TE: '#fa690f',
     RB: 'darkgreen',
 };
 
