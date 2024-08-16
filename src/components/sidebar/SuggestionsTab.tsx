@@ -18,6 +18,7 @@ interface SuggestionsProps {
 const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, onFavoriteToggle }) => {
     const { predictions } = usePredictions();
     const [selectedCriterion, setSelectedCriterion] = useState<string>('ADP');
+    const [selectedPosition, setSelectedPosition] = useState<Position | 'ALL'>('ALL');
     const [suggestions, setSuggestions] = useState<{ player: Player; vons: number }[]>([]);
 
     const calculateAdpField = useCallback(() => {
@@ -32,16 +33,20 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
                 !predictions.some(prediction => prediction.id === player.id) && !player.isDrafted
             )
             .sort((a, b) => b.valueOverReplacement - a.valueOverReplacement);
+
+        // Find one player from each position as the baseline
         baselinePlayers.forEach(player => {
             if (!baselineMap.has(player.position)) {
                 baselineMap.set(player.position, player.valueOverReplacement);
             }
         });
+
         availablePlayers.forEach(player => {
             const baseline = baselineMap.get(player.position) || 0;
             const vonsValue = player.valueOverReplacement - baseline;
             vons.set(player.id, vonsValue);
         });
+
         return Array.from(vons.entries())
             .sort(([, vonsA], [, vonsB]) => vonsB - vonsA)
             .slice(0, 10)
@@ -50,17 +55,31 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
                 vons: vonsValue,
             }));
     }, [players, predictions]);
-    
 
     const handleCriterionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCriterion(event.target.value);
     };
 
+    const handlePositionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const position = event.target.value as Position | 'ALL';
+        setSelectedPosition(position);
+    };
+
     useEffect(() => {
-        const availablePlayers = players.filter(player => !player.isDrafted);
-        
+        let availablePlayers = players.filter(player => !player.isDrafted);
+
+        // Filter by selected position
+        if (selectedPosition !== 'ALL') {
+            if (selectedPosition === 'FLEX') {
+                const flexPositions = draftSettings.teamSettings.flexOptions;
+                availablePlayers = availablePlayers.filter(player => flexPositions.includes(player.position));
+            } else {
+                availablePlayers = availablePlayers.filter(player => player.position === selectedPosition);
+            }
+        }
+
         let sortedPlayers: { player: Player; vons: number }[] = [];
-        
+
         switch (selectedCriterion) {
             case 'ADP':
                 const adpField = calculateAdpField();
@@ -92,7 +111,7 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
         }
 
         setSuggestions(sortedPlayers);
-    }, [selectedCriterion, players, predictions, calculateAdpField, calculateVons]);
+    }, [selectedCriterion, selectedPosition, players, predictions, calculateAdpField, calculateVons, draftSettings]);
 
     return (
         <div className="suggestions-tab">
@@ -104,6 +123,16 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
                     <option value="Overall Rank">Overall Rank</option>
                     <option value="Positional Rank">Positional Rank</option>
                     <option value="VONS">VONS</option>
+                </select>
+
+                <label htmlFor="position">Position:</label>
+                <select id="position" value={selectedPosition} onChange={handlePositionChange}>
+                    <option value="ALL">OVERALL</option>
+                    <option value={Position.QB}>QB</option>
+                    <option value={Position.WR}>WR</option>
+                    <option value={Position.RB}>RB</option>
+                    <option value={Position.TE}>TE</option>
+                    <option value="FLEX">FLEX</option>
                 </select>
             </div>
             <div className="suggestions-list">

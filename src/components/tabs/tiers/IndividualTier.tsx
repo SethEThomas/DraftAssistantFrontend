@@ -31,14 +31,21 @@ const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform
     });
 
     const dropClass = isOver ? (isEmpty ? 'over-empty' : 'over-non-empty') : '';
-    const sortedPlayers = [...tier.players].sort((a, b) => {
-        if (position === Position.OVERALL) {
-            return a.overallRank - b.overallRank;
-        } else {
-            return a.positionalRank - b.positionalRank;
-        }
-    });
-
+    let sortedPlayers;
+    if(tier.tierNumber > 0){
+        sortedPlayers = [...tier.players].sort((a, b) => {
+            if (position === Position.OVERALL) {
+                return a.overallRank - b.overallRank;
+            } else {
+                return a.positionalRank - b.positionalRank;
+            }
+        });
+    }
+    else{
+        sortedPlayers = [...tier.players].sort((a, b) => {
+            return b.stats.totalProjectedPoints - a.stats.totalProjectedPoints;
+        });
+    }
     useEffect(() => {
         const lockScroll = () => {
             if (isOver && isEmpty) {
