@@ -23,7 +23,8 @@ export interface Player {
     positionalRank: number;
     adp: AggregateAdp;
     stats: AggregateStat;
-    totalProjectedPoints: number;
     formattedPickNumber: string;
     isDrafted: boolean;
+    valueOverReplacement: number;
+    valueOverAverageStarter: number;
   }

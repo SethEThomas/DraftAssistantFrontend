@@ -19,6 +19,7 @@ import { TeamInterface } from './interfaces/TeamInterface';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { formatPickNumber } from './util/PickCalculator';
 import { toCamelCase } from './components/player/PlayerDisplaySmall';
+import { calculateMedian } from './util/Math';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 12,
@@ -61,6 +62,133 @@ function App() {
     return updatedPlayers;
   };
 
+  const calculateVORAndVOAS = (players: Player[], draftSettings: DraftSettingsInterface) => {
+    const { numTeams, teamSettings } = draftSettings;
+    const { qbSlots, rbSlots, wrSlots, teSlots, flexSlots, flexOptions } = teamSettings;
+
+    const numStarters = {
+        [Position.QB]: qbSlots * numTeams,
+        [Position.RB]: rbSlots * numTeams,
+        [Position.WR]: wrSlots * numTeams,
+        [Position.TE]: teSlots * numTeams,
+        [Position.FLEX]: flexSlots * numTeams,
+    };
+    const sortedPlayersByPosition: { [key in Position]: Player[] } = {
+        [Position.QB]: [],
+        [Position.RB]: [],
+        [Position.WR]: [],
+        [Position.TE]: [],
+        [Position.OVERALL]: [],
+        [Position.UNKNOWN]: [],
+        [Position.BENCH]: [],
+        [Position.FLEX]: []
+    };
+    const usedPlayers: { [key in Position]: Player[] } = {
+      [Position.QB]: [],
+      [Position.RB]: [],
+      [Position.WR]: [],
+      [Position.TE]: [],
+      [Position.OVERALL]: [],
+      [Position.UNKNOWN]: [],
+      [Position.BENCH]: [],
+      [Position.FLEX]: []
+    };
+
+    const flexAdditions: { [key in Position]: number } = {
+      [Position.QB]: 0,
+      [Position.RB]: 0,
+      [Position.WR]: 0,
+      [Position.TE]: 0,
+      [Position.OVERALL]: 0,
+      [Position.UNKNOWN]: 0,
+      [Position.BENCH]: 0,
+      [Position.FLEX]: 0
+    };
+
+    players.forEach(player => {
+        if (sortedPlayersByPosition[player.position]) {
+            sortedPlayersByPosition[player.position].push(player);
+        }
+        if(draftSettings.teamSettings.flexOptions.includes(player.position)){
+          sortedPlayersByPosition[Position.FLEX].push(player);
+        }
+    });
+    for (const position in sortedPlayersByPosition) {
+        sortedPlayersByPosition[position as Position].sort((a, b) => b.stats.totalProjectedPoints - a.stats.totalProjectedPoints);
+    }
+
+    for (const position of Object.keys(numStarters) as Array<keyof typeof numStarters>) {
+      let toPick = numStarters[position];
+      if(position !== Position.FLEX){
+        while(toPick > 0){
+          const usedPlayer = sortedPlayersByPosition[position].shift();
+          if(usedPlayer){
+            usedPlayers[position].push(usedPlayer);
+            const flexPlayersWithPlayerRemoved = sortedPlayersByPosition[Position.FLEX].reduce<Player[]>((acc, item) => {
+              if (item.id !== usedPlayer.id) {
+                acc.push(item);
+              }
+              return acc;
+            }, []);
+            sortedPlayersByPosition[Position.FLEX] = flexPlayersWithPlayerRemoved;
+          }
+          toPick--;
+        }
+      }
+    }
+
+    let toPick = numStarters[Position.FLEX];
+    while(toPick > 0){
+      const usedPlayer = sortedPlayersByPosition[Position.FLEX].shift()
+      if(usedPlayer){
+        usedPlayers[usedPlayer.position].push(usedPlayer);
+      }
+      toPick--;
+    }
+
+    const baseline: { [key in Position]: { replacement: number, averageStarter: number } } = {
+        [Position.QB]: { replacement: 0, averageStarter: 0 },
+        [Position.RB]: { replacement: 0, averageStarter: 0 },
+        [Position.WR]: { replacement: 0, averageStarter: 0 },
+        [Position.TE]: { replacement: 0, averageStarter: 0 },
+        [Position.OVERALL]: { replacement: 0, averageStarter: 0 },
+        [Position.UNKNOWN]: { replacement: 0, averageStarter: 0 },
+        [Position.BENCH]: { replacement: 0, averageStarter: 0 },
+        [Position.FLEX]: { replacement: 0, averageStarter: 0 }
+    };
+
+    for(const position of Object.keys(baseline)){
+      if(position === Position.QB || position === Position.WR || position === Position.RB || position === Position.TE){
+        let baselineReplacementValue = 0;
+        let averageStarterValue = 0;
+        const replacement = sortedPlayersByPosition[position][0];
+        if(replacement){
+          baselineReplacementValue = replacement.stats.totalProjectedPoints;
+        }
+        const median = calculateMedian(usedPlayers[position]);
+        if(median){
+          averageStarterValue = median;
+        }
+        baseline[position] = {replacement: baselineReplacementValue, averageStarter: averageStarterValue};
+      }
+    }
+
+
+    const updatedPlayers = players.map(player => {
+        const replacementBaseline = baseline[player.position].replacement;
+        const averageStarterBaseline = baseline[player.position].averageStarter;
+        return {
+            ...player,
+            valueOverReplacement: player.stats.totalProjectedPoints - replacementBaseline,
+            valueOverAverageStarter: player.stats.totalProjectedPoints - averageStarterBaseline,
+        };
+    });
+
+    return updatedPlayers;
+};
+
+  
+
   const handleFavoriteToggle = async (playerId: number) => {
     const updatedPlayers = players.map(player =>
         player.id === playerId
@@ -98,7 +226,8 @@ function App() {
     axios.get<Player[]>(BACKEND_URL + '/players')
       .then(response => {
         const playersWithFormattedPickNumber = updatePlayersWithFormattedPickNumber(response.data, draftSettings.numTeams);
-        setPlayers(playersWithFormattedPickNumber);
+        const playersWithVORAndVOAS = calculateVORAndVOAS(playersWithFormattedPickNumber, draftSettings);
+        setPlayers(playersWithVORAndVOAS);
         setLoading(false);
       })
       .catch(error => {
@@ -137,8 +266,8 @@ function App() {
 
   useEffect(() => {
     if (players.length > 0) {
-      const updatedPlayers = updatePlayersWithFormattedPickNumber(players, draftSettings.numTeams);
-      setPlayers(updatedPlayers);
+      const playersWithFormattedPickNumber = updatePlayersWithFormattedPickNumber(players, draftSettings.numTeams);
+      const playersWithVORAndVOAS = calculateVORAndVOAS(playersWithFormattedPickNumber, draftSettings);
     }
   }, [draftSettings.displayAdpType, draftSettings.displayAdpPlatform, draftSettings.numTeams]);
 

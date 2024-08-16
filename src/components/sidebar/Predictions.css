@@ -74,7 +74,7 @@
 
 /* Team number styling */
 .team-number {
-    font-size: 0.9rem; /* Same font size as the predicted picks text */
+    font-size: 0.8rem; /* Same font size as the predicted picks text */
     color: white;
     margin-right: 10px; /* Space between team number and colored background */
     width: 50px; /* Adjust width as needed */

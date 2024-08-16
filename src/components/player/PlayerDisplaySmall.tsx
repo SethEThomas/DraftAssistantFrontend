@@ -92,6 +92,20 @@ const PlayerDisplaySmall: React.FC<PlayerDisplaySmallProps> = ({ player, adpType
                             {formatNumber(adpValue - player.overallRank)}
                         </span>
                     </div>
+                    <div className="adp-section">
+                        <div className="adp-info">
+                            <div className="label">VORP:</div>
+                            <div className="value">
+                                {formatNumber(player.valueOverReplacement)}
+                            </div>
+                        </div>
+                        <div className="adp-info">
+                            <div className="label">VOAS:</div>
+                            <div className="value">
+                                {formatNumber(player.valueOverAverageStarter)}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="middle-column">

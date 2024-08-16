@@ -85,21 +85,32 @@
 }
 
 .adp-info {
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Use flexbox to arrange items horizontally */
+    flex-direction: column; /* Stack labels and values vertically */
     margin-top: 10px;
     font-size: 14px;
     color: lightgray;
 }
 
+.adp-info .adp-section {
+    display: flex; /* Arrange labels and values horizontally */
+    justify-content: space-between; /* Distribute space evenly */
+}
+
 .adp-info .label {
     font-weight: bold;
+    margin-right: 5px; /* Space between label and value */
 }
 
 .adp-info .value {
     font-weight: normal;
-    margin-right: 10px; /* Space between ADP value and any other elements */
 }
+
+.adp-info .value-over {
+    display: flex; /* Arrange VORP and VOAS horizontally */
+    justify-content: space-between; /* Distribute space evenly */
+}
+
 
 .favorite-icon {
     font-size: 24px;

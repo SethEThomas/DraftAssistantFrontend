@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Player } from '../../interfaces/Player';
 import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
 import { TeamInterface } from '../../interfaces/TeamInterface';
-import { calculateTeamPick } from '../../util/PickCalculator';
+import { calculateTeamPick, formatPickNumber } from '../../util/PickCalculator';
 import { AdpType } from '../../enums/AdpType.enum';
 import { Platform } from '../../enums/Platform.enum';
 import { Position } from '../../enums/Position.enum';
@@ -161,7 +161,7 @@ interface PredictionsProps {
           {predictions.map((player, index) => (
             <div key={index} className="prediction-item">
               <div className="team-number">
-                Team {calculateTeamPick(index + 1, draftSettings.numTeams, draftSettings.thirdRoundReversal)}
+                Team {calculateTeamPick(index + 1, draftSettings.numTeams, draftSettings.thirdRoundReversal)} Pick {formatPickNumber(index + 1, draftSettings.numTeams)}
               </div>
               <div className={`prediction-details ${getPlayerBackgroundClass(player.position)}`}>
                 {player.firstName} {player.lastName} | {player.position} ◇ {player.teamAbbreviation} | Proj. {formatNumber(player.stats?.totalProjectedPoints)}
