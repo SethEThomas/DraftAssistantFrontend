@@ -19,11 +19,16 @@ interface PredictionsProps {
   
   const PredictionsTab: React.FC<PredictionsProps> = ({ players, draftSettings, teams }) => {
     const [numPicks, setNumPicks] = useState(1);
-    const { predictions, setPredictions } = usePredictions(); // Use context properly
+    const { predictions, setPredictions } = usePredictions();
     const [draftedPlayerIds, setDraftedPlayerIds] = useState<Set<number>>(new Set());
     const [teamNeeds, setTeamNeeds] = useState<Map<number, Position[]>>(new Map());
     const [selectedTab, setSelectedTab] = useState<string>('All');
     const [bestPlayers, setBestPlayers] = useState<Player[]>([]);
+
+    const getCurrentPickNumber = (): number => {
+        const draftedPlayersCount = players.filter(player => player.isDrafted).length;
+        return draftedPlayersCount + 1;
+      };
   
     const handleNumPicksChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setNumPicks(parseInt(event.target.value));
@@ -157,7 +162,7 @@ interface PredictionsProps {
           {predictions.map((player, index) => (
             <div key={index} className="prediction-item">
               <div className="team-number">
-                Team {calculateTeamPick(index + 1, draftSettings.numTeams, draftSettings.thirdRoundReversal)} Pick {formatPickNumber(index + 1, draftSettings.numTeams)}
+                Team {calculateTeamPick(getCurrentPickNumber() + index, draftSettings.numTeams, draftSettings.thirdRoundReversal)} Pick {formatPickNumber(getCurrentPickNumber() + index, draftSettings.numTeams)}
               </div>
               <div className={`prediction-details ${getPlayerBackgroundClass(player.position)}`}>
                 {player.firstName} {player.lastName} | {player.position} ◇ {player.teamAbbreviation} | Proj. {formatNumber(player.stats?.totalProjectedPoints)}
