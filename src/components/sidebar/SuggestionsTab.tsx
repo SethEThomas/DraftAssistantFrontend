@@ -19,23 +19,29 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
     const { predictions } = usePredictions();
     const [selectedCriterion, setSelectedCriterion] = useState<string>('ADP');
     const [suggestions, setSuggestions] = useState<{ player: Player; vons: number }[]>([]);
-    
+
     const calculateAdpField = useCallback(() => {
         return `${Platform[draftSettings.displayAdpPlatform].toLowerCase()}${toCamelCase(AdpType[draftSettings.displayAdpType])}`;
     }, [draftSettings]);
 
-    const calculateVons = (availablePlayers: Player[], baselinePlayers: Player[]) => {
+    const calculateVons = useCallback((availablePlayers: Player[]) => {
         const vons = new Map<number, number>();
         const baselineMap = new Map<Position, number>();
+        const baselinePlayers = players
+            .filter(player => 
+                !predictions.some(prediction => prediction.id === player.id) && !player.isDrafted
+            )
+            .sort((a, b) => b.valueOverReplacement - a.valueOverReplacement);
         baselinePlayers.forEach(player => {
-            baselineMap.set(player.position, player.valueOverReplacement);
+            if (!baselineMap.has(player.position)) {
+                baselineMap.set(player.position, player.valueOverReplacement);
+            }
         });
         availablePlayers.forEach(player => {
             const baseline = baselineMap.get(player.position) || 0;
             const vonsValue = player.valueOverReplacement - baseline;
             vons.set(player.id, vonsValue);
         });
-
         return Array.from(vons.entries())
             .sort(([, vonsA], [, vonsB]) => vonsB - vonsA)
             .slice(0, 10)
@@ -43,7 +49,8 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
                 player: players.find(p => p.id === id) as Player,
                 vons: vonsValue,
             }));
-    };
+    }, [players, predictions]);
+    
 
     const handleCriterionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCriterion(event.target.value);
@@ -61,25 +68,24 @@ const SuggestionsTab: React.FC<SuggestionsProps> = ({ players, draftSettings, on
                     .filter(player => (player.adp as any)[adpField] > 0)
                     .sort((a, b) => (a.adp as any)[adpField] - (b.adp as any)[adpField])
                     .slice(0, 10)
-                    .map(player => ({ player, vons: 0 })); // Default vons to 0 for ADP
+                    .map(player => ({ player, vons: 0 }));
                 break;
             case 'Overall Rank':
                 sortedPlayers = availablePlayers
                     .filter(player => player.overallRank > 0)
                     .sort((a, b) => a.overallRank - b.overallRank)
                     .slice(0, 10)
-                    .map(player => ({ player, vons: 0 })); // Default vons to 0 for Overall Rank
+                    .map(player => ({ player, vons: 0 }));
                 break;
             case 'Positional Rank':
                 sortedPlayers = availablePlayers
                     .filter(player => player.positionalRank > 0)
                     .sort((a, b) => a.positionalRank - b.positionalRank)
                     .slice(0, 10)
-                    .map(player => ({ player, vons: 0 })); // Default vons to 0 for Positional Rank
+                    .map(player => ({ player, vons: 0 }));
                 break;
             case 'VONS':
-                const baselinePlayers = predictions.filter(player => !player.isDrafted);
-                sortedPlayers = calculateVons(availablePlayers, baselinePlayers);
+                sortedPlayers = calculateVons(availablePlayers);
                 break;
             default:
                 sortedPlayers = [];

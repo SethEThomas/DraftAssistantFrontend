@@ -18,7 +18,9 @@ interface PredictionsProps {
   }
   
   const PredictionsTab: React.FC<PredictionsProps> = ({ players, draftSettings, teams }) => {
-    const [numPicks, setNumPicks] = useState(1);
+    const [numPicks, setNumPicks] = useState(() => {
+        return parseInt(localStorage.getItem('numPicks') || '1');
+    });
     const { predictions, setPredictions } = usePredictions();
     const [draftedPlayerIds, setDraftedPlayerIds] = useState<Set<number>>(new Set());
     const [teamNeeds, setTeamNeeds] = useState<Map<number, Position[]>>(new Map());
@@ -30,9 +32,11 @@ interface PredictionsProps {
         return draftedPlayersCount + 1;
       };
   
-    const handleNumPicksChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setNumPicks(parseInt(event.target.value));
-    };
+      const handleNumPicksChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newNumPicks = parseInt(event.target.value);
+        setNumPicks(newNumPicks);
+        localStorage.setItem('numPicks', String(newNumPicks));
+      };
   
     const handleTabChange = (tab: string) => {
       setSelectedTab(tab);
