@@ -1,0 +1,142 @@
+.suggestions-tab {
+    padding: 1px;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Full width of the sidebar */
+    height: 100%; /* Ensure it takes the full height of its container */
+}
+
+/* Center and style the title */
+.suggestions-tab h2 {
+    text-align: center;
+    font-size: 1.2rem; /* Smaller font size for the title */
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ccc; /* Line under the header */
+    padding-bottom: 0.5rem;
+}
+
+/* Input section styling */
+.input-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Style the input section label */
+.input-section label {
+    font-size: 0.9rem; /* Smaller font size for the label */
+    margin-right: 10px; /* Space between label and input */
+    white-space: nowrap; /* Prevent label from wrapping */
+}
+
+/* Style the dropdown select field */
+.input-section select {
+    background-color: #333; /* Dark gray background */
+    color: #fff; /* White text */
+    border: 1px solid #666; /* Dark border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 0.5rem;
+    font-size: 0.9rem; /* Matching font size with the label */
+    width: 200px; /* Adjust width as needed */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+/* Style the suggestions list */
+.suggestions-list {
+    margin-top: 0.2rem;
+    width: 100%; /* Full width of the component */
+    border: 1px solid #666; /* Border around the section */
+    border-radius: 1px; /* Rounded corners for the border */
+    padding: 1px; /* Padding inside the border */
+    box-sizing: border-box; /* Ensure padding is included in width */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style each suggestion item */
+.suggestion-item {
+    font-size: 0.9rem; /* Smaller font size for suggestions */
+    padding: 10px;
+    margin: 2px 0;
+    border-bottom: 1px solid #666; /* Border around each item */
+    border-radius: 2px;
+    display: flex; /* Flex container */
+    align-items: center;
+    background-color: #2a2a2a; /* Default dark gray background color */
+}
+
+/* Alternate background colors */
+.suggestion-item:nth-child(even) {
+    background-color: #333; /* Slightly lighter gray */
+}
+
+/* Team number styling */
+.team-number {
+    font-size: 0.8rem; /* Same font size as the suggestions text */
+    color: white;
+    margin-right: 10px; /* Space between team number and colored background */
+    width: 50px; /* Adjust width as needed */
+    text-align: center; /* Center text inside the team number box */
+}
+
+/* Colored background container */
+.suggestion-details {
+    flex: 1; /* Take up remaining space */
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 5px; /* Padding inside the colored background */
+    color: white;
+}
+
+/* Background color classes based on position */
+.qb-background {
+    background-color: darkred;
+}
+
+.wr-background {
+    background-color: darkblue;
+}
+
+.rb-background {
+    background-color: darkgreen;
+}
+
+.te-background {
+    background-color: #fa690f;
+}
+
+.other-background {
+    background-color: darkgray;
+}
+
+/* Ensure consistency with the layout */
+.suggestions-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-suggestion {
+    position: relative;
+    margin-bottom: 20px; /* Adjust as needed for spacing between suggestions */
+}
+
+.vons-value {
+    position: absolute;
+    top: 0; /* Adjust as needed to position over the PlayerDisplaySmall */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    background-color: rgba(0, 0, 0, 0.6); /* Slight background for better readability */
+    color: white;
+    font-size: 0.8rem; /* Smaller text size */
+    padding: 2px 5px; /* Adjust padding as needed */
+    border-radius: 3px; /* Optional: rounded corners */
+    text-align: center; /* Center text inside the div */
+    z-index: 1; /* Ensure text is above other content */
+}
+
+.player-display-small {
+    /* Ensure PlayerDisplaySmall has relative positioning if needed */
+    position: relative;
+}

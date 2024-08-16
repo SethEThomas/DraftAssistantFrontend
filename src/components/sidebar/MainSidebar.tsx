@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Player } from '../../interfaces/Player';
-import { AdpType } from '../../enums/AdpType.enum';
-import { Platform } from '../../enums/Platform.enum';
+import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
+import { TeamInterface } from '../../interfaces/TeamInterface';
 import './MainSidebar.css';
 import PlayerSearchTab from './PlayerSearchTab';
 import PredictionsTab from './PredictionsTab';
 import SuggestionsTab from './SuggestionsTab';
-import { DraftSettingsInterface } from '../../interfaces/DraftSettingsInterface';
-import { TeamInterface } from '../../interfaces/TeamInterface';
+import { usePredictions } from './PredictionsContext';
 
 interface SidebarProps {
     players: Player[];
@@ -20,6 +19,7 @@ interface SidebarProps {
 
 const MainSidebar: React.FC<SidebarProps> = (props) => {
     const [selectedTab, setSelectedTab] = useState('PlayerSearch');
+    const { predictions } = usePredictions(); 
 
     const renderTabContent = () => {
         switch (selectedTab) {
@@ -28,7 +28,7 @@ const MainSidebar: React.FC<SidebarProps> = (props) => {
             case 'Predictions':
                 return <PredictionsTab players={props.players} teams={props.teams} draftSettings={props.draftSettings}/>;
             case 'Suggestions':
-                return <SuggestionsTab />;
+                return <SuggestionsTab players={props.players} draftSettings={props.draftSettings} onFavoriteToggle={props.onFavoriteToggle}/>;
             default:
                 return null;
         }

@@ -9,6 +9,7 @@ import { Position } from '../../enums/Position.enum';
 import './Predictions.css';
 import PlayerDisplaySmall, { toCamelCase } from '../player/PlayerDisplaySmall';
 import { formatNumber } from '../../util/FormatUtil';
+import { usePredictions } from './PredictionsContext';
 
 interface PredictionsProps {
     players: Player[];
@@ -18,7 +19,7 @@ interface PredictionsProps {
   
   const PredictionsTab: React.FC<PredictionsProps> = ({ players, draftSettings, teams }) => {
     const [numPicks, setNumPicks] = useState(1);
-    const [predictions, setPredictions] = useState<Player[]>([]);
+    const { predictions, setPredictions } = usePredictions(); // Use context properly
     const [draftedPlayerIds, setDraftedPlayerIds] = useState<Set<number>>(new Set());
     const [teamNeeds, setTeamNeeds] = useState<Map<number, Position[]>>(new Map());
     const [selectedTab, setSelectedTab] = useState<string>('All');
@@ -36,11 +37,9 @@ interface PredictionsProps {
       console.log('Making predictions');
       const newPredictions: Player[] = [];
       
-      // Reset internal states before starting calculations
       const currentDraftedPlayerIds = new Set<number>();
       const updatedTeamNeeds = new Map<number, Position[]>();
   
-      // Initialize team needs
       teams.forEach(team => {
         updatedTeamNeeds.set(team.teamId, getTeamNeeds(team, draftSettings));
       });
@@ -67,10 +66,7 @@ interface PredictionsProps {
       setPredictions(newPredictions);
       setDraftedPlayerIds(currentDraftedPlayerIds);
       setTeamNeeds(updatedTeamNeeds);
-      console.log(`Predictions made: ${JSON.stringify(newPredictions)}`);
-      console.log(`Drafted player ids: ${JSON.stringify(Array.from(currentDraftedPlayerIds))}`);
-      console.log(`Team needs: ${JSON.stringify(Array.from(updatedTeamNeeds.entries()))}`);
-    }, [numPicks, players, teams, draftSettings]);
+    }, [numPicks, players, teams, draftSettings, setPredictions]);
   
     useEffect(() => {
       makePredictions();

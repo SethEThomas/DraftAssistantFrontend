@@ -20,6 +20,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { formatPickNumber } from './util/PickCalculator';
 import { toCamelCase } from './components/player/PlayerDisplaySmall';
 import { calculateMedian } from './util/Math';
+import { PredictionsProvider } from './components/sidebar/PredictionsContext';
 
 const initialDraftSettings: DraftSettingsInterface = {
   numTeams: 12,
@@ -330,7 +331,9 @@ function App() {
       <div className="app">
         <MainNavbar players={players} onUpdatePlayer={handleUpdatePlayer} setPlayers={setPlayers} hideDrafted={hideDrafted} setHideDrafted={setHideDrafted} />
         <div className="main-layout">
-          <MainSidebar players={players} loading={loading} teams={teams} draftSettings={draftSettings} onFavoriteToggle={handleFavoriteToggle} hideDrafted={hideDrafted}/>
+          <PredictionsProvider>
+            <MainSidebar players={players} loading={loading} teams={teams} draftSettings={draftSettings} onFavoriteToggle={handleFavoriteToggle} hideDrafted={hideDrafted}/>
+          </PredictionsProvider>
           <main className="main-content">
             <Routes>
               <Route path="/" element={<DraftBoard players={players} draftSettings={draftSettings} teams={teams} setTeams={setTeams} setPlayers={setPlayers} draftPickSelections={draftPickSelections} setDraftPickSelections={setDraftPickSelections} hideDrafted={hideDrafted}/>} />
