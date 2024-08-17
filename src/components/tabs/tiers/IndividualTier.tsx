@@ -42,9 +42,16 @@ const IndividualTier: React.FC<IndividualTierProps> = ({ tier, adpType, platform
         });
     }
     else{
-        sortedPlayers = [...tier.players].sort((a, b) => {
-            return b.stats.totalProjectedPoints - a.stats.totalProjectedPoints;
-        });
+        if(position === Position.OVERALL){
+            sortedPlayers = [...tier.players].sort((a, b) => {
+                return b.valueOverAverageStarter - a.valueOverAverageStarter;
+            });
+        }
+        else{
+            sortedPlayers = [...tier.players].sort((a, b) => {
+                return b.stats.totalProjectedPoints - a.stats.totalProjectedPoints;
+            });
+        }
     }
     useEffect(() => {
         const lockScroll = () => {
