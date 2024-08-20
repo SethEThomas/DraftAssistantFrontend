@@ -44,6 +44,9 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
     const player = selectedPlayer || players.find(p => p.formattedPickNumber === pickNumber.toString());
     const backgroundColor = player ? getBackgroundColor(player.position) : '#3b3b3b';
 
+    const borderColor = player?.isSleeper ? 'red' : 'transparent';
+    const borderStyle = `3px solid ${borderColor}`;
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const text = e.target.value;
         setSearchText(text);
@@ -118,7 +121,11 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
     }, []);
 
     return (
-        <div className="draft-board-pick" style={{ backgroundColor }}>
+        <div className="draft-board-pick" 
+            style={{
+                backgroundColor,
+                border: player && player.isSleeper ? '2px solid red' : '2px solid #ccc'
+            }}>
             {selectedPlayer ? (
                 <div className="player-info">
                     <div className="remove-icon-container" onClick={handleRemovePlayer}>
@@ -164,7 +171,7 @@ const DraftBoardPick: React.FC<DraftBoardPickProps> = ({ players, pickNumber, te
                 </div>
             )}
             <div className="pick-number">
-                {formatPickNumber(pickNumber, teams.length)}
+                {formatPickNumber(pickNumber, teams.length)} ({pickNumber})
             </div>
         </div>
     );

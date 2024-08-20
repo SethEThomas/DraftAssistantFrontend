@@ -8,9 +8,10 @@
     border-radius: 8px;
     padding: 8px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, border 0.3s ease;
     text-align: left;
 }
+
 
 .draft-board-pick .pick-number {
     font-size: 12px;
